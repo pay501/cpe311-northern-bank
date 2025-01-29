@@ -3,15 +3,16 @@ package entities
 import "time"
 
 type User struct {
-	UserID      int       `json:"user_id"`
-	IDNumber    string    `json:"id_no"`
+	UserID      uint      `json:"user_id" gorm:"primaryKey"`
+	IDNumber    string    `json:"id_no" gorm:"unique"`
 	FirstName   string    `json:"first_name"`
 	LastName    string    `json:"last_name"`
 	BirthDay    time.Time `json:"birth_day"`
 	Address     string    `json:"address"`
-	PhoneNumber string    `json:"phone_no"`
-	Email       string    `json:"email"`
-	Username    string    `json:"username"`
+	PhoneNumber string    `json:"phone_no" gorm:"unique"`
+	Email       string    `json:"email" gorm:"unique"`
+	Username    string    `json:"username" gorm:"unique"`
 	Password    string    `json:"password"`
 	NumberOfAcc int       `json:"number_of_acc"`
+	Accounts    []Account `gorm:"foreignKey:UserID"`
 }

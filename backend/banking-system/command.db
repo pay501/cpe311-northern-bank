@@ -1,0 +1,21 @@
+<--Create users table-->
+CREATE TABLE "users" ("id" bigserial,"id_number" text,"first_name" text,"last_name" text,"gender" text,"role" text,"birth_day" timestamptz,"address" text,"phone_number" text,"email" text,"username" text,"password" text,"number_of_acc" bigint,PRIMARY KEY ("id"),CONSTRAINT "uni_users_username" UNIQUE ("username"),CONSTRAINT "uni_users_id_number" UNIQUE ("id_number"),CONSTRAINT "uni_users_phone_number" UNIQUE ("phone_number"),CONSTRAINT "uni_users_email" UNIQUE ("email"));
+
+<--Create accounts table-->
+CREATE TABLE "accounts" ("id" bigserial,"acc_no" varchar(20),"bank_code" varchar(10),"balance" decimal,"user_id" bigint,PRIMARY KEY ("id"),CONSTRAINT "fk_users_accounts" FOREIGN KEY ("id") REFERENCES "users"("id"))
+
+<--create transaction table-->
+CREATE TABLE "transactions" ("id" text,"from_user_id" bigint,"to_user_id" bigint,"amount" decimal,"from_user_acc_no" text,"from_user_bank_code" text,"to_user_acc_no" text,"to_user_bank_code" text,"created_at" timestamptz,PRIMARY KEY ("id"),CONSTRAINT "fk_users_transaction" FOREIGN KEY ("from_user_id") REFERENCES "users"("id"));
+
+<--create loan history table-->
+CREATE TABLE "loan_histories" ("id" bigserial,"status" text,"gnnder" text,"married" text,"dependents" bigint,"education" text,"self_employ" text,"applicant_income" decimal,"coapplicant_income" decimal,"loan_amount" decimal,"loan_amount_term" bigint,"credit_history" bigint,"property_area" text,"user_id" bigint,PRIMARY KEY ("id"),CONSTRAINT "fk_users_loan_history" FOREIGN KEY ("id") REFERENCES "users"("id"));
+
+<--insert data into users table-->
+INSERT INTO "users" ("id_number","first_name","last_name","gender","role","birth_day","address","phone_number","email","username","password","number_of_acc","id") VALUES ('123456789','Alice','Smith','Female','user','2004-05-13 00:00:00','123 Main St','0987654321','alice@gmail.com','alice','password123',1,1) RETURNING "id"
+
+<--insert data into accounts table-->
+INSERT INTO "accounts" ("acc_no","bank_code","balance","user_id","id") VALUES ('0673178839','KBANK',500,1,1) RETURNING "id"
+
+<--insert data into transaction table-->
+INSERT INTO "transactions" ("id","from_user_id","to_user_id","amount","from_user_acc_no","from_user_bank_code","to_user_acc_no","to_user_bank_code","created_at") VALUES ('abc123',1,3,500,'0673178839','KBANK','5678901234','TMB','2025-01-30 16:52:35.374')
+

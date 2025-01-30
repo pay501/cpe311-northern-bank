@@ -1,46 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"northern-bank/config"
 	"northern-bank/internal/entities"
-	"os"
 	"time"
 
 	_ "github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-)
-
-const (
-	host     = "localhost"     // or the Docker service name if running in another container
-	port     = 5432            // default PostgreSQL port
-	user     = "admin"         // as defined in docker-compose.yml
-	password = "password"      // as defined in docker-compose.yml
-	dbname   = "northern-bank" // as defined in docker-compose.yml
 )
 
 var DB *gorm.DB
 
 func main() {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname,
-	)
-
-	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: newLogger,
-		DryRun: true,
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
+	DB = config.InitDB()
 	DB.AutoMigrate(&entities.User{})
 	DB.AutoMigrate(&entities.Account{})
+	DB.AutoMigrate(&entities.Transaction{})
+	DB.AutoMigrate(&entities.LoanHistory{})
 
 	mockData()
 
@@ -59,23 +36,19 @@ func main() {
 	} */
 }
 
-var newLogger = logger.New(
-	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-	logger.Config{
-		SlowThreshold: time.Second, // Slow SQL threshold
-		LogLevel:      logger.Info, // Log level
-		Colorful:      true,        // Disable color
-	},
-)
-
 func mockData() {
 	users := []entities.User{
-		{UserID: 1, IDNumber: "123456789", FirstName: "Alice", LastName: "Smith", BirthDay: parseDate("13/05/04"), Address: "123 Main St", PhoneNumber: "0987654321", Email: "alice@gmail.com", Username: "alice", Password: "password123", NumberOfAcc: 1},
-		{UserID: 2, IDNumber: "987654321", FirstName: "Bob", LastName: "Brown", BirthDay: parseDate("25/08/90"), Address: "456 High St", PhoneNumber: "0912345678", Email: "bob@gmail.com", Username: "bob", Password: "password456", NumberOfAcc: 2},
-		{UserID: 3, IDNumber: "567890123", FirstName: "Charlie", LastName: "Johnson", BirthDay: parseDate("10/11/85"), Address: "789 Park Ave", PhoneNumber: "0923456789", Email: "charlie@gmail.com", Username: "charlie", Password: "password789", NumberOfAcc: 1},
+		{ID: 1, IDNumber: "123456789", FirstName: "Alice", LastName: "Smith", Gender: "Female", BirthDay: parseDate("13/05/04"), Address: "123 Main St", PhoneNumber: "0987654321", Email: "alice@gmail.com", Username: "alice", Password: "password123", NumberOfAcc: 1},
+		{ID: 2, IDNumber: "987654321", FirstName: "Bob", LastName: "Brown", Gender: "Male", BirthDay: parseDate("25/08/90"), Address: "456 High St", PhoneNumber: "0912345678", Email: "bob@gmail.com", Username: "bob", Password: "password456", NumberOfAcc: 2},
+		{ID: 3, IDNumber: "567890123", FirstName: "Charlie", LastName: "Johnson", Gender: "Male", BirthDay: parseDate("10/11/85"), Address: "789 Park Ave", PhoneNumber: "0923456789", Email: "charlie@gmail.com", Username: "charlie", Password: "password789", NumberOfAcc: 1},
 	}
 
 	for _, user := range users {
+		if user.Role == "" {
+			user.Role = "user"
+		} else {
+			user.Role = "admin"
+		}
 		result := DB.Create(&user)
 
 		if result.Error != nil {
@@ -86,10 +59,10 @@ func mockData() {
 	}
 
 	accounts := []entities.Account{
-		{AccID: 1, AccNo: "0673178839", BankCode: "KBANK", Balance: 500.00, UserID: 1},
-		{AccID: 2, AccNo: "1234567890", BankCode: "SCB", Balance: 1500.00, UserID: 2},
-		{AccID: 3, AccNo: "9876543210", BankCode: "BBL", Balance: 750.00, UserID: 2},
-		{AccID: 4, AccNo: "5678901234", BankCode: "TMB", Balance: 2000.00, UserID: 3},
+		{ID: 1, AccNo: "0673178839", BankCode: "KBANK", Balance: 500.00, UserID: 1},
+		{ID: 2, AccNo: "1234567890", BankCode: "SCB", Balance: 1500.00, UserID: 2},
+		{ID: 3, AccNo: "9876543210", BankCode: "BBL", Balance: 750.00, UserID: 2},
+		{ID: 4, AccNo: "5678901234", BankCode: "TMB", Balance: 2000.00, UserID: 3},
 	}
 
 	for _, account := range accounts {
@@ -98,6 +71,17 @@ func mockData() {
 			log.Println("❌ Failed to insert account:", account.AccNo, result.Error)
 		} else {
 			log.Println("✅ Inserted account:", account.AccNo)
+		}
+	}
+
+	transactions := []entities.Transaction{
+		{ID: "abc123", FromUserID: 1, ToUserID: 3, Amount: 500, FromUserAccNo: "0673178839", FromUserBankCode: "KBANK", ToUserAccNo: "5678901234", ToUserBankCode: "TMB"},
+	}
+
+	for _, transaction := range transactions {
+		reault := DB.Create(&transaction)
+		if reault.Error != nil {
+			log.Println("❌ Failed to insert account:", reault.Error)
 		}
 	}
 }

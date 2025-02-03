@@ -1,10 +1,10 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
-import joblib
+from imblearn.under_sampling import RandomUnderSampler
 
 # Load Data
 df_train = pd.read_csv('./dataset/train_u6lujuX_CVtuZ9i.csv')
@@ -44,8 +44,10 @@ X_train = scaler.fit_transform(X_train)
 X_val = scaler.transform(X_val)
 test_scaled = scaler.transform(test.drop(columns=['Loan_ID', 'Loan_Status'], errors='ignore'))
 
-# Train Logistic Regression Model
-model = LogisticRegression(max_iter=2000)
+
+# Train Support Vector Machine Model
+model = SVC(kernel='rbf', C=1.0, gamma='scale', class_weight='balanced')
+
 model.fit(X_train, y_train)
 
 # Evaluate the Model
@@ -54,6 +56,7 @@ print("Accuracy:", accuracy_score(y_val, y_pred))
 print("\nConfusion Matrix:\n", confusion_matrix(y_val, y_pred))
 print("\nClassification Report:\n", classification_report(y_val, y_pred))
 
-joblib.dump(scaler, './trained_logistic/logistic_scaler.pkl')
-joblib.dump(model, "./trained_logistic/logistic_loan_model.pkl")
+import joblib
+joblib.dump(scaler, "./trained_svm/svm_scaler.pkl")
+joblib.dump(model, "./trained_svm/svm_loan_model.pkl")
 print("Model saved successfully!")

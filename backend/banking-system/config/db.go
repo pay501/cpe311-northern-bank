@@ -1,11 +1,13 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -19,7 +21,7 @@ const (
 	dbname   = "northern-bank" // as defined in docker-compose.yml
 )
 
-func InitDB() *gorm.DB {
+func InitDbGorm() *gorm.DB {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname,
@@ -28,8 +30,22 @@ func InitDB() *gorm.DB {
 	var err error
 	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
-		DryRun: true,
+		DryRun: false,
 	})
+
+	if err != nil {
+		panic(err)
+	}
+	return DB
+}
+func InitDbSql() *sql.DB {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname,
+	)
+
+	var err error
+	DB, err := sql.Open("postgres", dsn)
 
 	if err != nil {
 		panic(err)

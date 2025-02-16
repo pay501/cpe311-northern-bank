@@ -1,25 +1,32 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	_ "log"
 	"northern-bank/config"
 	"northern-bank/internal/entities"
-	"time"
+	_ "northern-bank/internal/entities"
+	"northern-bank/internal/repositories"
+	"northern-bank/internal/usecases"
+	_ "time"
 
 	_ "github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	_ "gorm.io/gorm"
 )
 
-var DB *gorm.DB
+// var DB *gorm.DB
 
 func main() {
-	DB = config.InitDB()
-	DB.AutoMigrate(&entities.User{})
-	DB.AutoMigrate(&entities.Account{})
-	DB.AutoMigrate(&entities.Transaction{})
-	DB.AutoMigrate(&entities.LoanHistory{})
+	DB := config.InitDbSql()
+	userRepo := repositories.NewUserRepository(DB)
+	_ = usecases.NewUserUsecase(userRepo)
+	/* 	DB.AutoMigrate(&entities.User{})
+	   	DB.AutoMigrate(&entities.Account{})
+	   	DB.AutoMigrate(&entities.Transaction{})
+	   	DB.AutoMigrate(&entities.LoanHistory{})
 
-	mockData()
+	   	mockData() */
 
 	/* r := gin.Default()
 
@@ -34,9 +41,27 @@ func main() {
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	} */
+	var users []*entities.User
+
+	rows, err := DB.Query(`select first_Name from users;`)
+	if err != nil {
+		log.Panicln("Error with select users", err)
+	}
+	for rows.Next() {
+		user := &entities.User{}
+		err = rows.Scan(&user.FirstName)
+		if err != nil {
+			log.Panicln("Error with rows scan", err)
+		}
+		users = append(users, user)
+	}
+	for _, v := range users {
+		fmt.Println(v.FirstName)
+	}
+
 }
 
-func mockData() {
+/* func mockData() {
 	users := []entities.User{
 		{ID: 1, IDNumber: "123456789", FirstName: "Alice", LastName: "Smith", Gender: "Female", BirthDay: parseDate("13/05/04"), Address: "123 Main St", PhoneNumber: "0987654321", Email: "alice@gmail.com", Username: "alice", Password: "password123", NumberOfAcc: 1},
 		{ID: 2, IDNumber: "987654321", FirstName: "Bob", LastName: "Brown", Gender: "Male", BirthDay: parseDate("25/08/90"), Address: "456 High St", PhoneNumber: "0912345678", Email: "bob@gmail.com", Username: "bob", Password: "password456", NumberOfAcc: 2},
@@ -92,4 +117,4 @@ func parseDate(inputDate string) time.Time {
 		log.Fatalf("❌ Failed to parse date: %v", err)
 	}
 	return parsedDate
-}
+} */

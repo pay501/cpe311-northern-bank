@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"northern-bank/internal/entities"
 	"northern-bank/internal/usecases"
+	"northern-bank/pkg"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,6 +24,39 @@ func (h *userHandler) Testing(c *fiber.Ctx) error {
 	})
 }
 
+func (h *userHandler) Register(c *fiber.Ctx) error {
+
+	balance := c.Query("balance", "")
+
+	conBalance, err := strconv.ParseFloat(balance, 64)
+	if err != nil {
+		return handlerErr(c, fmt.Errorf("cannot convert balance"), fiber.StatusBadRequest)
+	}
+
+	if balance == "" || conBalance < 500 {
+		return handlerErr(c, fmt.Errorf("balance must more than 500"), fiber.StatusBadRequest)
+	}
+
+	req_data := entities.User{}
+	err = c.BodyParser(&req_data)
+	if err != nil {
+		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
+		return handlerErr(c, err, fiber.StatusInternalServerError)
+	}
+
+	account, err := h.userUsecase.Register(&req_data, conBalance)
+	if err != nil {
+		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
+		return handlerErr(c, err, fiber.StatusInternalServerError)
+	}
+
+	return c.JSON(fiber.Map{
+		"message":     "register successful",
+		"status code": fiber.StatusCreated,
+		"account":     account,
+	})
+}
+
 func (h *userHandler) Login(c *fiber.Ctx) error {
 	return nil
 }
@@ -29,16 +65,16 @@ func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 	transfer_req := usecases.TransferReq{}
 	err := c.BodyParser(&transfer_req)
 	if err != nil {
-		fmt.Printf("Error on user_controller.go at line 31: %v", err)
+		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
 		return c.JSON(fiber.Map{
-			"message":     "bad request",
+			"message":     err.Error(),
 			"status code": fiber.StatusBadRequest,
 		})
 	}
 
 	transaction, err := h.userUsecase.Transfer(transfer_req)
 	if err != nil {
-		fmt.Printf("Error on user_controller.go at line 39: %v \n", err)
+		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
 		return c.JSON(fiber.Map{
 			"message":     err.Error(),
 			"status code": fiber.StatusInternalServerError,

@@ -16,7 +16,7 @@ type TransferReq struct {
 	Amount           float64 `json:"amount"`
 }
 type UserUsecase interface {
-	Register(data *entities.User) error
+	Register(data *entities.User, balance float64) (*entities.Account, error)
 	Login(data LoginReq) (*entities.User, error)
 	Transfer(data TransferReq) (*entities.Transaction, error)
 	GetUsers() ([]*entities.User, error)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"northern-bank/internal/entities"
+	"northern-bank/pkg"
 )
 
 type UserRepositoryDB struct {
@@ -33,8 +34,19 @@ func (r *UserRepositoryDB) SelectUsers() ([]*entities.User, error) {
 	return users, nil
 }
 
-func (r *UserRepositoryDB) Save(user *entities.User) error {
-	return nil
+func (r *UserRepositoryDB) Save(req_data *entities.User) (int, error) {
+	var insertedId int
+	err := r.db.QueryRow(`
+		insert into users (id_number, first_name, last_name, birth_day, address, phone_number, email, username, password, number_of_acc, gender, role)
+		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		returning id;
+	`, req_data.IDNumber, req_data.FirstName, req_data.LastName, req_data.BirthDay, req_data.Address, req_data.PhoneNumber, req_data.Email, req_data.Username, req_data.Password, req_data.NumberOfAcc, req_data.Gender, req_data.Role).Scan(&insertedId)
+	if err != nil {
+		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
+		return 0, err
+	}
+
+	return insertedId, nil
 }
 
 func (r *UserRepositoryDB) FindByEmail(email string) (*entities.User, error) {
@@ -65,7 +77,7 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
         WHERE u.id = $1 and a.acc_no = $2;
 		`, transferReq.FromUserID, transferReq.FromUserAccNo).Scan(&senderAccId, &senderBalance, &senderId)
 	if err != nil {
-		fmt.Printf("Error on user_repo.go at line 67: %v", err)
+		fmt.Printf("Error on user_repo.go at line 67: %v\n", err)
 		return nil, err
 	}
 
@@ -83,7 +95,7 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
         WHERE a.acc_no = $1 and a.bank_code = $2;
 		`, transferReq.ToUserAccNo, transferReq.ToUserBankCode).Scan(&receiverId)
 	if err != nil {
-		fmt.Printf("Error on user_repo.go at line 85: %v", err)
+		fmt.Printf("Error on user_repo.go at line 85: %v\n", err)
 		return nil, err
 	}
 
@@ -143,4 +155,72 @@ func (r *UserRepositoryDB) FindTransactionByUserId(id int) ([]*entities.Transact
 	}
 	fmt.Println(transactions)
 	return transactions, nil
+}
+
+func (r *UserRepositoryDB) CheckDuplicateIDNumber(idNumber string) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM users WHERE id_number = $1)"
+	err := r.db.QueryRow(query, idNumber).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("error checking IDNumber: %v", err)
+	}
+	return exists, nil
+}
+
+func (r *UserRepositoryDB) CheckDuplicatePhoneNumber(phoneNumber string) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM users WHERE phone_number = $1)"
+	err := r.db.QueryRow(query, phoneNumber).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("error checking PhoneNumber: %v", err)
+	}
+	return exists, nil
+}
+
+func (r *UserRepositoryDB) CheckDuplicateEmail(email string) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)"
+	err := r.db.QueryRow(query, email).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("error checking Email: %v", err)
+	}
+	return exists, nil
+}
+
+func (r *UserRepositoryDB) CheckDuplicateUsername(username string) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)"
+	err := r.db.QueryRow(query, username).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("error checking Username: %v", err)
+	}
+	return exists, nil
+}
+
+func (r *UserRepositoryDB) CheckAllDuplicates(user *entities.User) (string, error) {
+	if exists, err := r.CheckDuplicateIDNumber(user.IDNumber); err != nil {
+		return "", err
+	} else if exists {
+		return "IDNumber is duplicated", nil
+	}
+
+	if exists, err := r.CheckDuplicatePhoneNumber(user.PhoneNumber); err != nil {
+		return "", err
+	} else if exists {
+		return "PhoneNumber is duplicated", nil
+	}
+
+	if exists, err := r.CheckDuplicateEmail(user.Email); err != nil {
+		return "", err
+	} else if exists {
+		return "Email is duplicated", nil
+	}
+
+	if exists, err := r.CheckDuplicateUsername(user.Username); err != nil {
+		return "", err
+	} else if exists {
+		return "Username is duplicated", nil
+	}
+
+	return "", nil // No duplicates found
 }

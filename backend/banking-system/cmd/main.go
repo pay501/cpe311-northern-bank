@@ -26,13 +26,16 @@ func main() {
 	   	mockData() */
 
 	userRepo := repositories.NewUserRepository(DB)
-	userUsecase := usecases.NewUserUsecase(userRepo)
+	accountRepo := repositories.NewAccountRepository(DB)
+
+	userUsecase := usecases.NewUserUsecase(userRepo, accountRepo)
+
 	userController := controllers.NewUserHandler(userUsecase)
 
 	app := fiber.New()
 
 	app.Get("/test", userController.Testing)
-
+	app.Post("/register", userController.Register)
 	app.Post("/transfer", userController.TransferMoney)
 
 	if err := app.Listen(":8080"); err != nil {

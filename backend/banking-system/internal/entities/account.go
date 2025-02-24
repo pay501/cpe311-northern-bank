@@ -6,5 +6,5 @@ type Account struct {
 	BankCode string  `gorm:"size:10" json:"bank_code"`
 	Balance  float64 `json:"balance"`
 	UserID   uint    `json:"user_id"`
-	User     User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"user"`
+	/* 	User     User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"user"` */
 }

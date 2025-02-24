@@ -14,5 +14,5 @@ type LoanHistory struct {
 	LoanAmountTerm    int     `json:"loan_amount_term"`
 	CreditHistory     int     `json:"credit_history"`
 	PropertyArea      string  `json:"property_area"`
-	UserID            int     `json:"user_id" gorm:"foreignKey:ID"`
+	UserID            int     `json:"user_id"`
 }

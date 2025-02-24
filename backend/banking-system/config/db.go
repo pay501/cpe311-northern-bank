@@ -22,22 +22,31 @@ const (
 )
 
 func InitDbGorm() *gorm.DB {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname,
-	)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
-	var err error
 	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 		DryRun: false,
 	})
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("❌ Failed to connect to DB: %v", err))
 	}
+
+	// Ping the database
+	sqlDB, err := DB.DB()
+	if err != nil {
+		panic(fmt.Sprintf("❌ Failed to get DB instance: %v", err))
+	}
+
+	if err := sqlDB.Ping(); err != nil {
+		panic(fmt.Sprintf("❌ Database ping failed: %v", err))
+	}
+
+	fmt.Println("✅ Database connected successfully!")
 	return DB
 }
+
 func InitDbSql() *sql.DB {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",

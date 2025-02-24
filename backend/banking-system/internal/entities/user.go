@@ -16,7 +16,7 @@ type User struct {
 	Username    string        `json:"username" gorm:"unique"`
 	Password    string        `json:"password"`
 	NumberOfAcc int           `json:"number_of_acc"`
-	Accounts    []Account     `gorm:"foreignKey:ID"`
+	Accounts    []Account     `gorm:"foreignKey:UserID"`
 	Transaction []Transaction `json:"transaction" gorm:"foreignKey:FromUserID"`
-	LoanHistory []LoanHistory `json:"loan_history" gorm:"foreignKey:ID"`
+	LoanHistory []LoanHistory `json:"loan_history" gorm:"foreignKey:UserID"`
 }

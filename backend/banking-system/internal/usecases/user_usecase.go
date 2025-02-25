@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"northern-bank/internal/dto"
 	"northern-bank/internal/entities"
 	"northern-bank/internal/repositories"
+	"northern-bank/internal/utils"
 	"northern-bank/pkg"
 	"time"
 
@@ -37,7 +39,6 @@ func (u *UserUsecaseDb) Register(req_data *entities.User, balance float64) (*ent
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req_data.Password), bcrypt.DefaultCost)
 	if err != nil {
-		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
 	}
 	req_data.Password = string(hashedPassword)
 
@@ -47,7 +48,6 @@ func (u *UserUsecaseDb) Register(req_data *entities.User, balance float64) (*ent
 	//todo save user data
 	savedId, err := u.userRepo.Save(req_data)
 	if err != nil {
-		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
 		return nil, err
 	}
 
@@ -61,26 +61,42 @@ func (u *UserUsecaseDb) Register(req_data *entities.User, balance float64) (*ent
 
 	account, err := u.accountRepo.CreateAccount(&acc_data)
 	if err != nil {
-		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
 		return nil, err
 	}
 
 	return account, nil
 }
 
-func (u *UserUsecaseDb) Login(data LoginReq) (*entities.User, error) {
-	return nil, nil
-}
-
-func (u *UserUsecaseDb) GetUsers() ([]*entities.User, error) {
-	users, err := u.userRepo.SelectUsers()
+func (u *UserUsecaseDb) Login(data dto.LoginReq) (string, error) {
+	user, err := u.userRepo.FindUserByEmailOrUsername(data.Email)
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("invalid email/username or password")
 	}
-	return users, nil
+
+	password := user["password"].(string)
+	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(data.Password))
+	if err != nil {
+		return "", fmt.Errorf("invalid email/username or password")
+	}
+
+	userIdInt, ok := user["id"].(int)
+	if !ok {
+		fmt.Printf("Error on %v => %v", pkg.GetCallerInfo(), err)
+		return "", err
+	}
+
+	userId := uint(userIdInt)
+	user_role := user["role"].(string)
+	token, err := utils.GenerateJWT(userId, user_role)
+	if err != nil {
+		fmt.Printf("Error on %v => %v", pkg.GetCallerInfo(), err)
+		return "", fmt.Errorf("failed to generate token: %v", err)
+	}
+
+	return token, nil
 }
 
-func (u *UserUsecaseDb) Transfer(req_data TransferReq) (*entities.Transaction, error) {
+func (u *UserUsecaseDb) Transfer(req_data dto.TransferReq) (*entities.Transaction, error) {
 	id := uuid.New().String()
 	id = "tst" + id
 

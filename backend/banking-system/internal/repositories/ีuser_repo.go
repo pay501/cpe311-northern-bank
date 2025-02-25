@@ -42,11 +42,39 @@ func (r *UserRepositoryDB) Save(req_data *entities.User) (int, error) {
 		returning id;
 	`, req_data.IDNumber, req_data.FirstName, req_data.LastName, req_data.BirthDay, req_data.Address, req_data.PhoneNumber, req_data.Email, req_data.Username, req_data.Password, req_data.NumberOfAcc, req_data.Gender, req_data.Role).Scan(&insertedId)
 	if err != nil {
-		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
 		return 0, err
 	}
 
 	return insertedId, nil
+}
+
+// ! I used map method || can be use dto method as well (create dto folder)
+func (r *UserRepositoryDB) FindUserByEmailOrUsername(data string) (map[string]interface{}, error) {
+	var id int
+	var first_name, last_name, email, role, password string
+
+	query := `select id, first_name, last_name, email, role, password from users where email = $1 or username = $1;`
+	row := r.db.QueryRow(query, data)
+	err := row.Scan(&id, &first_name, &last_name, &email, &role, &password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Printf("No user found with email or username: %s\n", data)
+			return nil, fmt.Errorf("no user found with email or username")
+		}
+		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
+		return nil, err
+	}
+
+	user := map[string]interface{}{
+		"id":         id,
+		"first_name": first_name,
+		"last_name":  last_name,
+		"email":      email,
+		"role":       role,
+		"password":   password,
+	}
+
+	return user, nil
 }
 
 func (r *UserRepositoryDB) FindByEmail(email string) (*entities.User, error) {
@@ -133,7 +161,18 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
 		return nil, err
 	}
 
-	return transferReq, nil
+	transferRes := &entities.Transaction{
+		ID:               transferReq.ID,
+		FromUserID:       int(senderId),
+		ToUserID:         int(receiverId),
+		Amount:           transferReq.Amount,
+		FromUserAccNo:    transferReq.FromUserAccNo,
+		FromUserBankCode: transferReq.FromUserBankCode,
+		ToUserAccNo:      transferReq.ToUserAccNo,
+		ToUserBankCode:   transferReq.ToUserBankCode,
+	}
+
+	return transferRes, nil
 }
 
 func (r *UserRepositoryDB) FindTransactionByUserId(id int) ([]*entities.Transaction, error) {

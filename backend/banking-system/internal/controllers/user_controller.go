@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"northern-bank/internal/dto"
 	"northern-bank/internal/entities"
 	"northern-bank/internal/usecases"
 	"northern-bank/pkg"
@@ -58,11 +59,23 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 }
 
 func (h *userHandler) Login(c *fiber.Ctx) error {
-	return nil
+	var body_req dto.LoginReq
+	if err := c.BodyParser(&body_req); err != nil {
+		return handlerErr(c, err, fiber.StatusBadRequest)
+	}
+
+	res, err := h.userUsecase.Login(body_req)
+	if err != nil {
+		return handlerErr(c, err, fiber.StatusUnauthorized)
+	}
+
+	return c.JSON(fiber.Map{
+		"token": res,
+	})
 }
 
 func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
-	transfer_req := usecases.TransferReq{}
+	transfer_req := dto.TransferReq{}
 	err := c.BodyParser(&transfer_req)
 	if err != nil {
 		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)

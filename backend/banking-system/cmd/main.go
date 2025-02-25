@@ -6,6 +6,7 @@ import (
 	"northern-bank/internal/controllers"
 	"northern-bank/internal/repositories"
 	"northern-bank/internal/usecases"
+	"northern-bank/middleware"
 
 	_ "github.com/gin-gonic/gin"
 	"github.com/gofiber/fiber/v2"
@@ -36,12 +37,15 @@ func main() {
 
 	app.Get("/test", userController.Testing)
 	app.Post("/register", userController.Register)
-	app.Post("/transfer", userController.TransferMoney)
+	app.Post("/login", userController.Login)
+
+	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
 
 	if err := app.Listen(":8080"); err != nil {
 		log.Fatal(err)
 	}
 
+	//! test here
 }
 
 /* func mockData() {

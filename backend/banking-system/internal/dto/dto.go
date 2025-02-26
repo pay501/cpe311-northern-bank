@@ -13,3 +13,13 @@ type TransferReq struct {
 	ToUserBankCode   string  `json:"to_user_bank_code"`
 	Amount           float64 `json:"amount"`
 }
+
+type UpdateUserCredentialReq struct {
+	Id         int    `json:"user_id"`
+	Credential string `json:"credential"`
+}
+
+type UpdateUserCredentialRes struct {
+	Id         int    `json:"user_id"`
+	Credential string `json:"credential"`
+}

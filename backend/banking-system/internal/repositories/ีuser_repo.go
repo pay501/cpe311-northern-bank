@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"northern-bank/internal/dto"
 	"northern-bank/internal/entities"
 	"northern-bank/pkg"
 )
@@ -79,6 +80,45 @@ func (r *UserRepositoryDB) FindUserByEmailOrUsername(data string) (map[string]in
 
 func (r *UserRepositoryDB) FindByEmail(email string) (*entities.User, error) {
 	return nil, nil
+}
+
+func (r *UserRepositoryDB) UpdateEmail(data *dto.UpdateUserCredentialReq) (*dto.UpdateUserCredentialRes, error) {
+	query := `update users set email = $1 where id = $2;`
+	_, err := r.db.Exec(query, data.Credential, data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	res := dto.UpdateUserCredentialRes{
+		Id:         data.Id,
+		Credential: data.Credential,
+	}
+
+	return &res, nil
+}
+
+func (r *UserRepositoryDB) UpdatePhoneNumber(data *dto.UpdateUserCredentialReq) (*dto.UpdateUserCredentialRes, error) {
+	query := `update users set phone_number = $1 where id = $2;`
+	_, err := r.db.Exec(query, data.Credential, data.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	res := dto.UpdateUserCredentialRes{
+		Id:         data.Id,
+		Credential: data.Credential,
+	}
+
+	return &res, nil
+}
+
+func (r *UserRepositoryDB) UpdatePassword(data *dto.UpdateUserCredentialReq) error {
+	query := `update users set password = $1 where id = $2;`
+	_, err := r.db.Exec(query, data.Credential, data.Id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*entities.Transaction, error) {

@@ -4,31 +4,24 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
-from imblearn.under_sampling import RandomUnderSampler
 
-# Load Data
 df_train = pd.read_csv('./dataset/train_u6lujuX_CVtuZ9i.csv')
 df_test = pd.read_csv('./dataset/test_Y3wMUE5_7gLdaTN.csv')
 
-# Preprocessing
 df_train['Loan_Status'] = df_train['Loan_Status'].map({'Y': 1, 'N': 0})
 data = pd.concat([df_train, df_test], ignore_index=True)
 
-# Handle missing values
 imputer = SimpleImputer(strategy='median')
 data['LoanAmount'] = imputer.fit_transform(data[['LoanAmount']])
 data['Loan_Amount_Term'] = imputer.fit_transform(data[['Loan_Amount_Term']])
 data['Credit_History'] = imputer.fit_transform(data[['Credit_History']])
 
-# Fill categorical missing values with mode
 for col in ['Gender', 'Married', 'Dependents', 'Self_Employed']:
     data[col] = data[col].fillna(data[col].mode()[0])
 
-# Encode categorical variables
 categorical_cols = ['Gender', 'Married', 'Dependents', 'Education', 'Self_Employed', 'Property_Area']
 data = pd.get_dummies(data, columns=categorical_cols, drop_first=True)
 
-# Separate train and test datasets
 train = data.iloc[:len(df_train)]
 test = data.iloc[len(df_train):]
 

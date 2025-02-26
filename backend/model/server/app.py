@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from sklearn.preprocessing import StandardScaler
+#from sklearn.preprocessing import StandardScaler
 
 try:
     model = joblib.load("../trained_svm/svm_loan_model.pkl")

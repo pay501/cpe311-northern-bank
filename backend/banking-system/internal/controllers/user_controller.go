@@ -51,7 +51,7 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 		return handlerErr(c, err, fiber.StatusInternalServerError)
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message":     "register successful",
 		"status code": fiber.StatusCreated,
 		"account":     account,
@@ -98,5 +98,31 @@ func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 		"message":     "transfer successful",
 		"status code": fiber.StatusOK,
 		"transaction": transaction,
+	})
+}
+
+func (h *userHandler) GetTransactions(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return handlerErr(c, fmt.Errorf("missing user ID"), fiber.StatusUnauthorized)
+	}
+
+	userIDInt, ok := userID.(float64)
+	if !ok {
+		return handlerErr(c, fmt.Errorf("invalid user ID format"), fiber.StatusUnauthorized)
+	}
+
+	transactions, err := h.userUsecase.Transactions(int(userIDInt))
+	if err != nil {
+		// if strings.Contains(err.Error(), "no transactios found")
+		if err.Error() == "no transactions found" {
+			return handlerErr(c, err, fiber.StatusNotFound)
+		} else {
+			return handlerErr(c, err, fiber.StatusInternalServerError)
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"result": transactions,
 	})
 }

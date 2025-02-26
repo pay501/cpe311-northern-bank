@@ -3,7 +3,6 @@ package usecases
 import (
 	"errors"
 	"fmt"
-	"math/big"
 	"northern-bank/internal/dto"
 	"northern-bank/internal/entities"
 	"northern-bank/internal/repositories"
@@ -16,14 +15,20 @@ import (
 )
 
 type UserUsecaseDb struct {
-	userRepo    repositories.UserRepository
-	accountRepo repositories.AccountRepository
+	userRepo        repositories.UserRepository
+	accountRepo     repositories.AccountRepository
+	transactionRepo repositories.TransactionRepository
 }
 
-func NewUserUsecase(userRepo repositories.UserRepository, accountRepo repositories.AccountRepository) *UserUsecaseDb {
+func NewUserUsecase(
+	userRepo repositories.UserRepository,
+	accountRepo repositories.AccountRepository,
+	transactionRepo repositories.TransactionRepository,
+) *UserUsecaseDb {
 	return &UserUsecaseDb{
-		userRepo:    userRepo,
-		accountRepo: accountRepo,
+		userRepo:        userRepo,
+		accountRepo:     accountRepo,
+		transactionRepo: transactionRepo,
 	}
 }
 
@@ -54,12 +59,32 @@ func (u *UserUsecaseDb) Register(req_data *entities.User, balance float64) (*ent
 	//todo account
 	acc_data := entities.Account{
 		UserID:   uint(savedId),
-		AccNo:    generateUUIDAccountNumber(),
+		AccNo:    utils.GenerateUUIDAccountNumber(),
 		BankCode: "NTHBANK",
 		Balance:  balance,
 	}
 
 	account, err := u.accountRepo.CreateAccount(&acc_data)
+	if err != nil {
+		return nil, err
+	}
+
+	transactionId := uuid.New().String()
+	transactionId = "tst" + transactionId
+
+	transactionData := dto.FirstTransactionReq{
+		ID:               transactionId,
+		FromUserID:       123456789,
+		ToUserID:         int(account.UserID),
+		Amount:           balance,
+		CreatedAt:        time.Now(),
+		FromUserAccNo:    "nthbank1234567890",
+		FromUserBankCode: "NTHBANK",
+		ToUserAccNo:      account.AccNo,
+		ToUserBankCode:   account.BankCode,
+	}
+
+	err = u.transactionRepo.SaveFirstTransaction(transactionData)
 	if err != nil {
 		return nil, err
 	}
@@ -119,17 +144,21 @@ func (u *UserUsecaseDb) Transfer(req_data dto.TransferReq) (*entities.Transactio
 	return trasaction, nil
 }
 
-func generateUUIDAccountNumber() string {
-	u := uuid.New()
-
-	num := new(big.Int)
-	num.SetBytes(u[:])
-
-	accountNumber := num.Mod(num, big.NewInt(1e10)).String()
-
-	for len(accountNumber) < 10 {
-		accountNumber = "0" + accountNumber
+func (u *UserUsecaseDb) Transactions(id int) ([]*dto.TransactionRes, error) {
+	transactions, err := u.transactionRepo.FindTransactionByUserId(id)
+	if err != nil {
+		return nil, err
 	}
 
-	return accountNumber
+	if len(transactions) == 0 {
+		return nil, fmt.Errorf("no transactions found")
+	}
+
+	fromUserId := transactions[0].FromUserID
+
+	if id != fromUserId {
+		return nil, fmt.Errorf("unautorization")
+	}
+
+	return transactions, nil
 }

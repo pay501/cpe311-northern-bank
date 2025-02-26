@@ -28,8 +28,9 @@ func main() {
 
 	userRepo := repositories.NewUserRepository(DB)
 	accountRepo := repositories.NewAccountRepository(DB)
+	transactionRepo := repositories.NewTransactionRepository(DB)
 
-	userUsecase := usecases.NewUserUsecase(userRepo, accountRepo)
+	userUsecase := usecases.NewUserUsecase(userRepo, accountRepo, transactionRepo)
 
 	userController := controllers.NewUserHandler(userUsecase)
 
@@ -40,6 +41,7 @@ func main() {
 	app.Post("/login", userController.Login)
 
 	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
+	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
 
 	if err := app.Listen(":8080"); err != nil {
 		log.Fatal(err)

@@ -34,6 +34,5 @@ google-services.json
 
 .idea
 .vscode
-requirements.txt
 __pycache__/
-*.pyc
+backend/model/model

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 const Home: React.FC = () => {
     const navigate = useNavigate()
     useEffect(()=>{
+        localStorage.setItem("jwtToken", "")
         const jwtToken = localStorage.getItem("jwtToken");
 
         if (!jwtToken || jwtToken === "") {

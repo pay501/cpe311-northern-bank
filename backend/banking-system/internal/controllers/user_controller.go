@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"northern-bank/internal/dto"
 	"northern-bank/internal/entities"
 	"northern-bank/internal/usecases"
 	"northern-bank/pkg"
@@ -50,7 +51,7 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 		return handlerErr(c, err, fiber.StatusInternalServerError)
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message":     "register successful",
 		"status code": fiber.StatusCreated,
 		"account":     account,
@@ -58,11 +59,23 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 }
 
 func (h *userHandler) Login(c *fiber.Ctx) error {
-	return nil
+	var body_req dto.LoginReq
+	if err := c.BodyParser(&body_req); err != nil {
+		return handlerErr(c, err, fiber.StatusBadRequest)
+	}
+
+	res, err := h.userUsecase.Login(body_req)
+	if err != nil {
+		return handlerErr(c, err, fiber.StatusUnauthorized)
+	}
+
+	return c.JSON(fiber.Map{
+		"token": res,
+	})
 }
 
 func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
-	transfer_req := usecases.TransferReq{}
+	transfer_req := dto.TransferReq{}
 	err := c.BodyParser(&transfer_req)
 	if err != nil {
 		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
@@ -85,5 +98,31 @@ func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 		"message":     "transfer successful",
 		"status code": fiber.StatusOK,
 		"transaction": transaction,
+	})
+}
+
+func (h *userHandler) GetTransactions(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return handlerErr(c, fmt.Errorf("missing user ID"), fiber.StatusUnauthorized)
+	}
+
+	userIDInt, ok := userID.(float64)
+	if !ok {
+		return handlerErr(c, fmt.Errorf("invalid user ID format"), fiber.StatusUnauthorized)
+	}
+
+	transactions, err := h.userUsecase.Transactions(int(userIDInt))
+	if err != nil {
+		// if strings.Contains(err.Error(), "no transactios found")
+		if err.Error() == "no transactions found" {
+			return handlerErr(c, err, fiber.StatusNotFound)
+		} else {
+			return handlerErr(c, err, fiber.StatusInternalServerError)
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"result": transactions,
 	})
 }

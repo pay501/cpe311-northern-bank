@@ -69,7 +69,7 @@ func (h *userHandler) Login(c *fiber.Ctx) error {
 		return handlerErr(c, err, fiber.StatusUnauthorized)
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": res,
 	})
 }

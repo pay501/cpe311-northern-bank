@@ -1,13 +1,35 @@
+import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const Login : React.FC  = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const navigate = useNavigate()
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Username:", username);
     console.log("Password:", password);
+    try{
+      await axios.post(`http://localhost:8080/login`,{
+        email: username,
+        password: password,
+      }).then((response)=>{
+        if (response.status == 401){
+          alert("Unaothorized")
+          return
+        } else if(response.status == 200){
+          navigate("/")
+          return
+        }
+      })
+    }catch(err){
+      console.log("Error ==> ", err)
+      alert("There is something error, Please Cheack log.")
+    }
     // TODO: Add authentication logic here
   };
 

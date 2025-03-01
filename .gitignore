@@ -35,8 +35,4 @@ google-services.json
 .idea
 .vscode
 __pycache__/
-<<<<<<< HEAD
-*.pyc
-=======
 backend/model/model
->>>>>>> 20d8fbbb064c5e521d7d27c47b1ba6f0270760d2

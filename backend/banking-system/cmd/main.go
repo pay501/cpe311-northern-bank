@@ -10,6 +10,7 @@ import (
 
 	_ "github.com/gin-gonic/gin"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 //var DB *gorm.DB
@@ -36,10 +37,22 @@ func main() {
 
 	app := fiber.New()
 
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:5173/", // Allow frontend requests
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Content-Type, Authorization",
+		AllowCredentials: true,
+	}))
+
 	app.Get("/test", userController.Testing)
 	app.Post("/register", userController.Register)
 	app.Post("/login", userController.Login)
 
+	app.Get("/check-session", middleware.AuthMiddleware, func(c *fiber.Ctx) error {
+		log.Println("Received request to /check-session")
+		// ...
+		return c.SendString("Session is valid")
+	})
 	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
 

@@ -1,16 +1,35 @@
+import axios from "axios"
 import React, { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 const Home: React.FC = () => {
-    const navigate = useNavigate()
-    useEffect(()=>{
-        localStorage.setItem("jwtToken", "")
+    const navigate = useNavigate();
+
+    useEffect(() => {
         const jwtToken = localStorage.getItem("jwtToken");
 
         if (!jwtToken || jwtToken === "") {
             navigate("/authen");
+            return;
         }
-    },[])
+
+        axios.get(`http://localhost:8080/check-session`, {
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+            .then(res => {
+                console.log("Session valid", res.data);
+            })
+            .catch(err => {
+                if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+                    localStorage.removeItem("jwtToken");
+                    navigate("/authen");
+                } else {
+                    console.error("Error checking session:", err);
+                }
+            });
+    }, [navigate]);
     return (
         <div className="flex h-screen">
             {/* Sidebar */}

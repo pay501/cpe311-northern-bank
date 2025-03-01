@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,24 +11,34 @@ const Login : React.FC  = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Username:", username);
-    console.log("Password:", password);
-    try{
-      await axios.post(`http://localhost:8080/login`,{
-        email: username,
-        password: password,
-      }).then((response)=>{
-        if (response.status == 401){
-          alert("Unaothorized")
-          return
-        } else if(response.status == 200){
-          navigate("/")
-          return
+
+    try {
+        await axios.post(`http://localhost:8080/login`, {
+            email: username,
+            password: password,
+        }).then((response) => {
+            if (response.status === 200) {
+              localStorage.setItem("jwtToken", response.data.token)  
+              navigate("/");
+                return;
+            } else{
+              console.log(response)
+            }
+        });
+    } catch (err) {
+        if (axios.isAxiosError(err)) { // Check if err is an AxiosError
+            const axiosError = err as AxiosError; // Type assertion
+            if (axiosError.response && axiosError.response.status === 401) {
+                alert("Unauthorized");
+            } else {
+                console.log("Error ==> ", axiosError);
+                alert("There is something error, Please Check log.");
+            }
+        } else {
+            // Handle other types of errors
+            console.log("An unexpected error occurred:", err);
+            alert("An unexpected error occurred. Check the console.");
         }
-      })
-    }catch(err){
-      console.log("Error ==> ", err)
-      alert("There is something error, Please Cheack log.")
     }
     // TODO: Add authentication logic here
   };

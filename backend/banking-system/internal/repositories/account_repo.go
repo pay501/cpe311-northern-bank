@@ -31,3 +31,22 @@ func (a *AccountRepositoryDB) CreateAccount(acc_req *entities.Account) (*entitie
 
 	return &account, nil
 }
+
+func (a *AccountRepositoryDB) FindAccountByUserId(id int) ([]*entities.Account, error) {
+	accounts := []*entities.Account{}
+	query := `SELECT acc_id, acc_no, bank_code, balance FROM accounts WHERE user_id = $1;`
+	rows, err := a.db.Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		account := &entities.Account{}
+		account.UserID = uint(id)
+		err = rows.Scan(&account.AccID, &account.AccNo, &account.BankCode, &account.Balance)
+		if err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, account)
+	}
+	return accounts, nil
+}

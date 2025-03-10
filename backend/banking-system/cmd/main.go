@@ -32,13 +32,15 @@ func main() {
 	transactionRepo := repositories.NewTransactionRepository(DB)
 
 	userUsecase := usecases.NewUserUsecase(userRepo, accountRepo, transactionRepo)
+	accountUsecase := usecases.NewAccountUsecase(accountRepo)
 
 	userController := controllers.NewUserHandler(userUsecase)
+	accountController := controllers.NewAccountHandler(&accountUsecase)
 
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:5173/", // Allow frontend requests
+		AllowOrigins:     "http://localhost:5173/",
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders:     "Content-Type, Authorization",
 		AllowCredentials: true,
@@ -53,6 +55,8 @@ func main() {
 		// ...
 		return c.SendString("Session is valid")
 	})
+
+	app.Get("/bank-information/:id", middleware.AuthMiddleware, accountController.GetAccountByUserId)
 	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
 

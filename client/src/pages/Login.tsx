@@ -18,9 +18,9 @@ const Login : React.FC  = () => {
             password: password,
         }).then((response) => {
             if (response.status === 200) {
-              localStorage.setItem("jwtToken", response.data.token)  
+              sessionStorage.setItem("jwtToken", response.data.token)  
               navigate("/");
-                return;
+              return;
             } else{
               console.log(response)
             }

@@ -130,7 +130,6 @@ func (h *userHandler) GetTransactions(c *fiber.Ctx) error {
 func (h *userHandler) GetUserById(c *fiber.Ctx) error {
 	userIdFromToken := c.Locals("user_id")
 	userIdFromTokenInt, ok := userIdFromToken.(float64)
-	fmt.Print(userIdFromToken)
 	if !ok {
 		return handlerErr(c, fmt.Errorf("cannot convert userIdFromToken"), fiber.StatusBadRequest)
 	}

@@ -10,4 +10,5 @@ type UserUsecase interface {
 	Login(data dto.LoginReq) (string, error)
 	Transfer(data dto.TransferReq) (*entities.Transaction, error)
 	Transactions(id int) ([]*dto.TransactionRes, error)
+	SelectUserById(userId int, userIdFromToken int) (*entities.User, error)
 }

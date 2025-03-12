@@ -35,6 +35,19 @@ func (r *UserRepositoryDB) SelectUsers() ([]*entities.User, error) {
 	return users, nil
 }
 
+func (r *UserRepositoryDB) FindUserById(userId int, userIdFromToken int) (*entities.User, error) {
+	user := &entities.User{}
+
+	query := `SELECT id, id_number, first_name, last_name, gender, role, birth_day, address, phone_number, email, number_of_acc FROM users WHERE id = $1;`
+	row := r.db.QueryRow(query, userId)
+
+	err := row.Scan(&user.ID, &user.IDNumber, &user.FirstName, &user.LastName, &user.Gender, &user.Role, &user.BirthDay, &user.Address, &user.PhoneNumber, &user.Email, &user.NumberOfAcc)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (r *UserRepositoryDB) Save(req_data *entities.User) (int, error) {
 	var insertedId int
 	err := r.db.QueryRow(`

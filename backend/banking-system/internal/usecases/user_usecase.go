@@ -162,3 +162,16 @@ func (u *UserUsecaseDb) Transactions(id int) ([]*dto.TransactionRes, error) {
 
 	return transactions, nil
 }
+
+func (u *UserUsecaseDb) SelectUserById(userId int, userIdFromToken int) (*entities.User, error) {
+	if userId != userIdFromToken {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	user, err := u.userRepo.FindUserById(userId, userIdFromToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

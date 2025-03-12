@@ -34,7 +34,7 @@ func (a *AccountRepositoryDB) CreateAccount(acc_req *entities.Account) (*entitie
 
 func (a *AccountRepositoryDB) FindAccountByUserId(id int) ([]*entities.Account, error) {
 	accounts := []*entities.Account{}
-	query := `SELECT acc_id, acc_no, bank_code, balance FROM accounts WHERE user_id = $1;`
+	query := `SELECT acc_id, acc_no, bank_code, balance FROM accounts WHERE user_id = $1 AND bank_code = 'NTHBANK';`
 	rows, err := a.db.Query(query, id)
 	if err != nil {
 		return nil, err

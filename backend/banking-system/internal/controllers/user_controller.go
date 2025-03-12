@@ -126,3 +126,30 @@ func (h *userHandler) GetTransactions(c *fiber.Ctx) error {
 		"result": transactions,
 	})
 }
+
+func (h *userHandler) GetUserById(c *fiber.Ctx) error {
+	userIdFromToken := c.Locals("user_id")
+	userIdFromTokenInt, ok := userIdFromToken.(float64)
+	fmt.Print(userIdFromToken)
+	if !ok {
+		return handlerErr(c, fmt.Errorf("cannot convert userIdFromToken"), fiber.StatusBadRequest)
+	}
+
+	userIdFromParam := c.Params("userId")
+	userIdFromParamInt, err := strconv.ParseInt(userIdFromParam, 10, 64)
+	if err != nil {
+		return handlerErr(c, fmt.Errorf("cannot convert userIdFromParam"), fiber.StatusBadRequest)
+	}
+
+	if int(userIdFromParamInt) != int(userIdFromTokenInt) {
+		return handlerErr(c, fmt.Errorf("unauthorized"), fiber.StatusUnauthorized)
+	}
+
+	user, err := h.userUsecase.SelectUserById(int(userIdFromParamInt), int(userIdFromTokenInt))
+	if err != nil {
+		return handlerErr(c, err, fiber.StatusInternalServerError)
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"user": user,
+	})
+}

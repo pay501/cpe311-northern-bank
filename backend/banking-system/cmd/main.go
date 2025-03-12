@@ -56,6 +56,7 @@ func main() {
 		return c.SendString("Session is valid")
 	})
 
+	app.Get("/user/:userId", middleware.AuthMiddleware, userController.GetUserById)
 	app.Get("/bank-information/:id", middleware.AuthMiddleware, accountController.GetAccountByUserId)
 	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)

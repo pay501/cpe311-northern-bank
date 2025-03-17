@@ -13,3 +13,4 @@ export function CurrentDateTime(): string{
     const minutes = now.getMinutes().toString().padStart(2, "0");
     return `${day} ${month} ${year}, ${hours}:${minutes} น.`
 }
+

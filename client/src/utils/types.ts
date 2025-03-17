@@ -1,8 +1,9 @@
 export interface Account {
-    accId: number;
-    accNumber: string;
-    bankCode: string;
+    acc_id: string;
+    acc_no: string;
     balance: number;
+    bank_code: string;
+    user_id: number;
 }
 
 export type User = {

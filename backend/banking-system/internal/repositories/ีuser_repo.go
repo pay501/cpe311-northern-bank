@@ -156,9 +156,9 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
         FROM users u
         INNER JOIN accounts a ON u.id = a.user_id
         WHERE u.id = $1 and a.acc_no = $2;
-		`, transferReq.FromUserID, transferReq.FromUserAccNo).Scan(&senderAccId, &senderBalance, &senderId)
+		`, transferReq.FromUserID, transferReq.FromUserAccNo).Scan(&senderId, &senderBalance, &senderAccId)
 	if err != nil {
-		fmt.Printf("Error on user_repo.go at line 67: %v\n", err)
+		pkg.GetCallerInfo()
 		return nil, err
 	}
 
@@ -168,7 +168,6 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
 	}
 
 	var receiverId int64
-
 	err = tx.QueryRow(`
         SELECT u.id
         FROM users u
@@ -176,7 +175,7 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
         WHERE a.acc_no = $1 and a.bank_code = $2;
 		`, transferReq.ToUserAccNo, transferReq.ToUserBankCode).Scan(&receiverId)
 	if err != nil {
-		fmt.Printf("Error on user_repo.go at line 85: %v\n", err)
+		pkg.GetCallerInfo()
 		return nil, err
 	}
 
@@ -200,12 +199,38 @@ func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*en
 		return nil, err
 	}
 
+	var senderExists, receiverExists bool
+
+	// ตรวจสอบ senderId
+	err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)`, senderId).Scan(&senderExists)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("error checking sender existence: %v", err)
+	}
+
+	// ตรวจสอบ receiverId
+	err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)`, receiverId).Scan(&receiverExists)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("error checking receiver existence: %v", err)
+	}
+
+	// ถ้าไม่พบ sender หรือ receiver
+	if !receiverExists {
+		tx.Rollback()
+		return nil, fmt.Errorf("receiver does not exist")
+	}
+	if !senderExists {
+		tx.Rollback()
+		return nil, fmt.Errorf("sender does not exist")
+	}
+
 	_, err = tx.Exec(`
 		insert into transactions (id, from_user_id, to_user_id, amount, created_at, from_user_acc_no, from_user_bank_code, to_user_acc_no, to_user_bank_code)
 		values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`, transferReq.ID, senderId, receiverId, transferReq.Amount, transferReq.CreatedAt, transferReq.FromUserAccNo, transferReq.FromUserBankCode, transferReq.ToUserAccNo, transferReq.ToUserBankCode)
 	if err != nil {
-		fmt.Printf("Error on user_repo.go at line 114: %v\n", err)
+		pkg.GetCallerInfo()
 		return nil, err
 	}
 

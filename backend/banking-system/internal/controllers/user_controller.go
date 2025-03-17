@@ -79,7 +79,7 @@ func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 	err := c.BodyParser(&transfer_req)
 	if err != nil {
 		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
-		return c.JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"message":     err.Error(),
 			"status code": fiber.StatusBadRequest,
 		})
@@ -88,7 +88,7 @@ func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 	transaction, err := h.userUsecase.Transfer(transfer_req)
 	if err != nil {
 		fmt.Printf("Error on %v => %v\n", pkg.GetCallerInfo(), err)
-		return c.JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"message":     err.Error(),
 			"status code": fiber.StatusInternalServerError,
 		})

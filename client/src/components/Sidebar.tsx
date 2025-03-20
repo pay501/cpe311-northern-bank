@@ -20,13 +20,13 @@ const Sidebar: React.FC<SidebarProps> = ({ userData }) => {
       <nav>
         <ul className="overflow-y-auto">
           <li className="px-4 py-2 hover:bg-green-700">
-            <Link to="/">โฮม</Link>
+            <Link className="w-64" to="/">โฮม</Link>
           </li>
           <li className="px-4 py-2 hover:bg-green-700">
             <Link to="/loan">สินเชื่อ</Link>
           </li>
           <li className="px-4 py-2 hover:bg-green-700">
-            <Link to="/transfer">โอนเงิน</Link>
+            <Link to="/fundtransfer">โอนเงิน</Link>
           </li>
           <li className="px-4 py-2 hover:bg-green-700">
             <Link to="/history">ประวัติรายการ</Link>

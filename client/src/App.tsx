@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Transfer from "./pages/Transfer";
+import Loan from "./pages/Loan";
 
 const App: React.FC = () => {
   return (
@@ -17,8 +18,13 @@ const App: React.FC = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
         </Route>
+        
         <Route path="/fundtransfer" element={<Layout/>}>
           <Route index element={<Transfer/>} />
+        </Route>
+
+        <Route path="loan" element={<Layout/>}>
+          <Route index element={<Loan/>}/>
         </Route>
       </Routes>
     </Router>

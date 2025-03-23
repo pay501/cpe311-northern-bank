@@ -58,20 +58,20 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen w-full">
       {/* Sidebar Fixed with Full Height */}
-      <aside className="">
+      <aside className="w-[15%] fixed h-screen">
         <Sidebar userData={userData}/>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1">
         
-        <header className="">
+        <header className="fixed w-[85%] ml-[290px] ">
           <Header userData={userData} />
         </header>
 
-        <main className="overflow-auto">
+        <main className="overflow-auto mt-16 ml-[290px]">
           {/* Pass props to child components */}
           <Outlet context={{ userData, accounts, jwtToken }} />
         </main>

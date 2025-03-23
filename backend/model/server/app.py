@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 import jwt  
 from jwt import PyJWTError
+from fastapi.middleware.cors import CORSMiddleware
 
 try:
     model = joblib.load("../trained_svm/svm_loan_model.pkl")
@@ -16,6 +17,14 @@ except Exception as e:
     raise HTTPException(status_code=500, detail=f"Error loading model or scaler: {str(e)}")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins, modify for better security
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Database Connection
 DATABASE_URL = "postgresql://admin:password@localhost:5432/northern-bank"
@@ -53,6 +62,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     credit_history = Column(Float, nullable=False)
+    gender = Column(String, nullable=False)
 
 # Loan Request Model
 class LoanRequest(BaseModel):

@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import React, { useState } from "react";
+import {useOutletContext } from "react-router-dom";
 import { User } from "../utils/types";
 
 type LoanFromProps = {
@@ -83,31 +83,53 @@ const MultiStepForm: React.FC = () => {
       {step === 1 && (
         <div>
           <h2 className="text-lg font-semibold mb-4">Step 1: Personal Information</h2>
-          <p>เพศ</p>
-          <label><input type="radio" name="Gender" value="Male" onChange={handleChange} /> ชาย</label>
-          <label><input type="radio" name="Gender" value="Female" onChange={handleChange} /> หญิง</label>
+          <p className="text-lg font-semibold">
+            เพศ
+          </p>
+          <label className="">
+            <input 
+              type="radio" 
+              name="Gender" 
+              value="Male" 
+              onChange={handleChange} 
+            /> 
+            &nbsp;ชาย
+          </label>
+          <label className="ml-8">
+            <input 
+              type="radio" 
+              name="Gender" 
+              value="Female" 
+              onChange={handleChange} 
+            /> 
+            &nbsp;หญิง
+          </label>
           
-          <p>สถานะสมรส</p>
+          <p className="text-lg font-semibold mt-3">
+            สถานะสมรส
+          </p>
           <label><input type="radio" name="Married" value="Yes" onChange={handleChange} /> แต่งงานแล้ว</label>
-          <label><input type="radio" name="Married" value="No" onChange={handleChange} /> โสด</label>
+          <label className="ml-8"><input type="radio" name="Married" value="No" onChange={handleChange} /> โสด</label>
           
-          <p>จำนวนผู้ที่อยู่ในอุปการะ</p>
-          <input type="text" name="Dependents" placeholder="จำนวนผู้ที่อยู่ในอุปการะ" onChange={handleChange} value={formData.Dependents} className="w-full mb-2 p-2 border rounded" />
+          <p className="text-lg font-semibold mt-3">
+            จำนวนผู้ที่อยู่ในอุปการะ
+          </p>
+          <input type="number" min={0} name="Dependents" placeholder="จำนวนผู้ที่อยู่ในอุปการะ" onChange={handleChange} value={formData.Dependents} className="w-full mb-2 p-2 border rounded" />
           
-          <p>ระดับการศึกษา</p>
+          <p className="text-lg font-semibold mt-3">ระดับการศึกษา</p>
           <label><input type="radio" name="Education" value="Yes" onChange={handleChange} /> จบปริญญาตรี หริอสูงกว่า</label>
-          <label><input type="radio" name="Education" value="No" onChange={handleChange} /> จบต่ำกว่าปริญญาตรี</label>
+          <label className="ml-8"><input type="radio" name="Education" value="No" onChange={handleChange} /> จบต่ำกว่าปริญญาตรี</label>
           
-          <p>ประกอบอาชีพอิสระ</p>
+          <p className="text-lg font-semibold mt-3">ประกอบอาชีพอิสระ</p>
           <label><input type="radio" name="Self_Employed" value="Yes" onChange={handleChange} /> ใช่</label>
-          <label><input type="radio" name="Self_Employed" value="No" onChange={handleChange} /> ไม่</label>
+          <label className="ml-8"><input type="radio" name="Self_Employed" value="No" onChange={handleChange} /> ไม่</label>
           
-          <p>พื้นที่อสังหาริมทรัพย์</p>
+          <p className="text-lg font-semibold mt-3">พื้นที่อสังหาริมทรัพย์</p>
           <label><input type="radio" name="Property_Area" value="Urban" onChange={handleChange} /> เมือง</label>
-          <label><input type="radio" name="Property_Area" value="Semiurban" onChange={handleChange} /> กึ่งเมือง</label>
-          <label><input type="radio" name="Property_Area" value="Rural" onChange={handleChange} /> ชนบท</label>
-          
-          <button onClick={() => isStep1Valid() && setStep(2)} className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300" disabled={!isStep1Valid()}>
+          <label className="ml-8"><input type="radio" name="Property_Area" value="Semiurban" onChange={handleChange} /> กึ่งเมือง</label>
+          <label className="ml-8"><input type="radio" name="Property_Area" value="Rural" onChange={handleChange} /> ชนบท</label>
+          <hr />
+          <button onClick={() => isStep1Valid() && setStep(2)} className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300 mt-3" disabled={!isStep1Valid()}>
             ถัดไป
           </button>
         </div>
@@ -116,16 +138,16 @@ const MultiStepForm: React.FC = () => {
       {step === 2 && (
         <div>
           <h2 className="text-lg font-semibold mb-4 p-6 m-6">Step 2: Loan Information</h2>
-          <p>รายได้ของผู้กู้</p>
+          <p className="text-lg font-semibold mt-3">รายได้ของผู้กู้</p>
           <input type="number" name="ApplicantIncome" placeholder="รายได้ของผู้กู้" onChange={handleChange} value={formData.ApplicantIncome} className="w-full mb-2 p-2 border rounded" />
 
-          <p>รายได้ของผู้กู้ร่วม</p>
+          <p className="text-lg font-semibold mt-3">รายได้ของผู้กู้ร่วม</p>
           <input type="number" name="CoapplicantIncome" placeholder="รายได้ของผู้กู้ร่วม" onChange={handleChange} value={formData.CoapplicantIncome} className="w-full mb-2 p-2 border rounded" />
 
-          <p>จำนวนเงินกู้</p>
+          <p className="text-lg font-semibold mt-3">จำนวนเงินกู้</p>
           <input type="number" name="LoanAmount" placeholder="จำนวนเงินกู้" onChange={handleChange} value={formData.LoanAmount} className="w-full mb-2 p-2 border rounded" />
 
-          <p>ระยะเวลาการกู้</p>
+          <p className="text-lg font-semibold mt-3">ระยะเวลาการกู้</p>
           <input type="number" name="Loan_Amount_Term" placeholder="ระยะเวลาการกู้" onChange={handleChange} value={formData.Loan_Amount_Term} className="w-full mb-2 p-2 border rounded" />
           
           <button onClick={() => setStep(1)} className="bg-gray-400 text-white px-4 py-2 rounded mr-2">

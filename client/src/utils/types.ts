@@ -24,3 +24,14 @@ export type User = {
     user_id: number;
     username: string;
 }
+
+export type TransactionType = {
+    amount: number;
+    created_at: string;
+    from_user_acc_no: string;
+    from_user_bank_code: string;
+    from_user_id: number;
+    id: string;
+    to_user_acc_no: string;
+    to_user_bank_code: string;
+}

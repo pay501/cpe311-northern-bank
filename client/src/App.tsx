@@ -6,6 +6,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Transfer from "./pages/Transfer";
 import Loan from "./pages/Loan";
+import Transaction from "./pages/Transaction";
 
 const App: React.FC = () => {
   return (
@@ -23,9 +24,14 @@ const App: React.FC = () => {
           <Route index element={<Transfer/>} />
         </Route>
 
-        <Route path="loan" element={<Layout/>}>
+        <Route path="/loan" element={<Layout/>}>
           <Route index element={<Loan/>}/>
         </Route>
+
+        <Route path="/transfer-history" element={<Layout/>}>
+          <Route index element={<Transaction/>}/>
+        </Route>
+
       </Routes>
     </Router>
   );

@@ -65,19 +65,19 @@ const Transaction = () => {
                 {transactions.map((val: TransactionType, index: number) => (
                   <tr key={index} className="border-t">
                     <td className="px-4 py-2 whitespace-nowrap">
-                      {val.created_at}
+                      {val.created_at.split("T")[0]}
                       <br />
                       <span className="text-xs text-gray-500">
-                        {val.created_at}
+                        {(val.created_at.split("T")[1]).split(".")[0]}  
                       </span>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      {val.created_at}
+                      {val.created_at.split("T")[0]}
                     </td>
                     <td className="px-4 py-2">โอนเงินบัญชีอื่น</td>
-                    <td className="px-4 py-2">{val.from_user_acc_no}</td>
+                    <td className="px-4 py-2">{val.from_user_acc_no} &nbsp;{val.from_user_bank_code}</td>
                     <td className="px-4 py-2 whitespace-pre-wrap">
-                      {val.to_user_acc_no}
+                      {val.to_user_acc_no} &nbsp;{val.to_user_bank_code}
                     </td>
                     <td className="px-4 py-2 text-right">
                       {val.amount.toLocaleString(undefined, {

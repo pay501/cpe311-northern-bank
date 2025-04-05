@@ -1,3 +1,8 @@
+export interface DecodedToken {
+    exp: number;
+    role: string;
+    user_id: number;
+}
 export interface Account {
     acc_id: string;
     acc_no: string;

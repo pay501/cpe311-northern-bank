@@ -7,15 +7,26 @@ import Home from "./pages/Home";
 import Transfer from "./pages/Transfer";
 import Loan from "./pages/Loan";
 import Transaction from "./pages/Transaction";
+import WaitLoan from "./pages/WaitLoan";
 
 const App: React.FC = () => {
+
+  
+  
   return (
     <Router>
       <Routes>
         <Route path="/authen" element={<Login />} />
-        <Route path="/create-user" element={<Register />} />
         
         {/* Protected Routes with Layout */}
+        <Route path="/create-user" element={<Layout />}>
+          <Route index element={<Register />} />
+        </Route>
+
+        <Route path="/loan-history" element={<Layout />}>
+          <Route index element={<WaitLoan />} />
+        </Route>
+
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
         </Route>

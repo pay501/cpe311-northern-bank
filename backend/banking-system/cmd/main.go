@@ -30,12 +30,15 @@ func main() {
 	userRepo := repositories.NewUserRepository(DB)
 	accountRepo := repositories.NewAccountRepository(DB)
 	transactionRepo := repositories.NewTransactionRepository(DB)
+	loanRepo := repositories.NewLoanRepository(DB)
 
 	userUsecase := usecases.NewUserUsecase(userRepo, accountRepo, transactionRepo)
 	accountUsecase := usecases.NewAccountUsecase(accountRepo)
+	loanUsecase := usecases.NewLoanUsecase(loanRepo)
 
 	userController := controllers.NewUserHandler(userUsecase)
 	accountController := controllers.NewAccountHandler(&accountUsecase)
+	loanCoontroller := controllers.NewLoanHandler(loanUsecase)
 
 	app := fiber.New()
 
@@ -60,6 +63,8 @@ func main() {
 	app.Get("/bank-information/:id", middleware.AuthMiddleware, accountController.GetAccountByUserId)
 	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
+
+	app.Get("/loan-request-histories", loanCoontroller.GetLoanReqHistories)
 
 	if err := app.Listen(":8080"); err != nil {
 		log.Fatal(err)

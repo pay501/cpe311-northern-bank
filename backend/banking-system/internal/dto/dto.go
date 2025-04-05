@@ -50,3 +50,21 @@ type TransactionRes struct {
 	ToUserBankCode   string    `json:"to_user_bank_code"`
 	CreatedAt        time.Time `json:"created_at"`
 }
+
+type LoanHistoryRes struct {
+	ID                int     `json:"id"`
+	Status            string  `json:"status"`
+	Gender            string  `json:"gender"`
+	Married           string  `json:"married"`
+	Dependents        string  `json:"dependents"`
+	Education         string  `json:"education"`
+	SelfEmployed      string  `json:"self_employed"`
+	ApplicantIncome   float64 `json:"applicant_income"`
+	CoapplicantIncome float64 `json:"coapplicant_income"`
+	LoanAmount        float64 `json:"loan_amount"`
+	LoanAmountTerm    float64 `json:"loan_amount_term"`
+	PropertyArea      string  `json:"property_area"`
+	UserID            int     `json:"user_id"`
+	Result            *string `json:"result"`
+	CreditHistory     float64 `json:"credit_history"`
+}

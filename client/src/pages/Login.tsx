@@ -1,46 +1,63 @@
 import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DecodedToken } from "../utils/types";
+import { DecodedJwtToken, FetchUserData } from "../utils/functions";
+import logo from "../assets/northern bank logo.png";
 
-
-const Login : React.FC  = () => {
+const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-        await axios.post(`http://localhost:8080/login`, {
-            email: username,
-            password: password,
-        }).then((response) => {
-            if (response.status === 200) {
-              sessionStorage.setItem("jwtToken", response.data.token)  
-              navigate("/");
-              return;
-            } else{
-              console.log(response)
-            }
-        });
-    } catch (err) {
-        if (axios.isAxiosError(err)) { // Check if err is an AxiosError
-            const axiosError = err as AxiosError; // Type assertion
-            if (axiosError.response && axiosError.response.status === 401) {
-                alert("Unauthorized");
-            } else {
-                console.log("Error ==> ", axiosError);
-                alert("There is something error, Please Check log.");
-            }
+      const response = await axios.post(`http://localhost:8080/login`, {
+        email: username,
+        password: password,
+      });
+
+      if (response.status === 200) {
+        const jwtToken = response.data.token;
+        sessionStorage.setItem("jwtToken", jwtToken);
+
+        const decodedToken: DecodedToken = DecodedJwtToken(jwtToken);
+        const userResponse = await FetchUserData(
+          decodedToken.user_id,
+          jwtToken
+        );
+
+        if (userResponse?.data?.user) {
+          const user = userResponse.data.user;
+
+          if (user.role === "user") {
+            navigate("/");
+          } else {
+            navigate("/loan-history");
+          }
         } else {
-            // Handle other types of errors
-            console.log("An unexpected error occurred:", err);
-            alert("An unexpected error occurred. Check the console.");
+          console.error("User not found in response");
         }
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        // Check if err is an AxiosError
+        const axiosError = err as AxiosError; // Type assertion
+        if (axiosError.response && axiosError.response.status === 401) {
+          alert("Unauthorized");
+        } else {
+          console.log("Error ==> ", axiosError);
+          alert("There is something error, Please Check log.");
+        }
+      } else {
+        // Handle other types of errors
+        console.log("An unexpected error occurred:", err);
+        alert("An unexpected error occurred. Check the console.");
+      }
     }
-    // TODO: Add authentication logic here
   };
 
   return (
@@ -49,9 +66,9 @@ const Login : React.FC  = () => {
         {/* Logo */}
         <div className="flex justify-center">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Kasikorn_Bank.svg/1200px-Kasikorn_Bank.svg.png"
+            src={logo}
             alt="Northern Bank"
-            className="w-32 mb-4"
+            className="w-32 mb-4 rounded-full"
           />
         </div>
 

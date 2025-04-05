@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {DecodedToken, User } from "../utils/types";
+import { useNavigate } from "react-router-dom";
+import { DecodedJwtToken, FetchUserData } from "../utils/functions";
+
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState<User | null>(null);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     id_number: "",
@@ -14,6 +20,32 @@ const Register = () => {
     username: "",
     password: "",
   });
+
+  const fetchData = async () => {
+    const jwtToken = sessionStorage.getItem("jwtToken");
+    if (!jwtToken || jwtToken === "") {
+      navigate("/authen");
+      return;
+    }
+
+    const decodedToken: DecodedToken = DecodedJwtToken(jwtToken);
+    console.log(decodedToken);
+
+    const response = await FetchUserData(decodedToken.user_id, jwtToken);
+    if (response?.data?.user) {
+      console.log("Fetched User:", response.data.user);
+      setUserData(response.data.user)
+    }
+  };
+
+  useEffect(() => {
+    fetchData()
+    if(userData != null){
+      if(userData.role !== "admin"){
+        navigate("/authen")
+      }
+    }
+  }, [userData]);
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -75,7 +107,8 @@ const Register = () => {
               <div className="flex flex-col">
                 <h2 className="text-4xl font-bold">Authentication</h2>
                 <p className="pt-5">
-                    Create Username<br />
+                  Create Username
+                  <br />
                   and Password
                 </p>
               </div>

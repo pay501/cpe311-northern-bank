@@ -12,7 +12,6 @@ type HomeProps = {
 const Home: React.FC = () => {
   // Get data from Layout.tsx
   const { userData, accounts } = useOutletContext<HomeProps>();
-  console.log(accounts)
   return (
     <>
       {accounts.map((val: Account, key: number) => {

@@ -46,7 +46,7 @@ const Transfer: React.FC = () => {
   
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen">
       {accounts.length === 0 ? (
         <p className="text-2xl font-bold">Loading...</p>
       ) : (

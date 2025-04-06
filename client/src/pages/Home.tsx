@@ -13,17 +13,19 @@ const Home: React.FC = () => {
   // Get data from Layout.tsx
   const { userData, accounts } = useOutletContext<HomeProps>();
   return (
-    <>
+    <div className="w-[60%]">
       {accounts.map((val: Account, key: number) => {
         return (
           <section className="p-8" key={key}>
             <div className="bg-white shadow-md rounded-lg p-6">
-              <h3 className="text-2xl font-bold mb-4">
-                บัญชีที่ {key + 1}: เลขที่บัญชี {val.acc_no}
-              </h3>
-              <h3 className="text-xl font-bold mb-4">
-                ยอดเงินที่ใช้ได้ทั้งหมด (บาท)
-              </h3>
+              <div className="">
+                <h3 className="text-2xl font-bold mb-4">
+                  บัญชีที่ {key + 1}: เลขที่บัญชี {val.acc_no}
+                </h3>
+                <h3 className="text-xl font-bold mb-4">
+                  ยอดเงินที่ใช้ได้ทั้งหมด (บาท)
+                </h3>
+              </div>
               <p className="text-2xl text-green-900 font-semibold">
                 <CountUp
                   end={val.balance}
@@ -77,7 +79,7 @@ const Home: React.FC = () => {
           </section>
         );
       })}
-    </>
+    </div>
   );
 };
 

@@ -1,8 +1,8 @@
-import axios, { AxiosError } from "axios";
+   import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DecodedToken } from "../utils/types";
-import { DecodedJwtToken, FetchUserData } from "../utils/functions";
+import { DecodedJwtToken, FetchUserData } from "../utils/functions";     
 import logo from "../assets/northern bank logo.png";
 
 const Login: React.FC = () => {

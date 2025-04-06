@@ -71,7 +71,7 @@ const Layout: React.FC = () => {
           <Header userData={userData} />
         </header>
 
-        <main className="overflow-auto mt-16 ml-[290px]">
+        <main className="overflow-auto mt-16 ml-[290px] min-h-screen bg-gray-100">
           {/* Pass props to child components */}
           <Outlet context={{ userData, accounts, jwtToken }} />
         </main>

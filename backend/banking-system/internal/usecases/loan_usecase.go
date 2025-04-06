@@ -20,3 +20,11 @@ func (u *LoanUsecaseDb) GetLoanHistories() ([]*dto.LoanHistoryRes, error) {
 	}
 	return loanHisteries, nil
 }
+
+func (u *LoanUsecaseDb) UpdateLoanResult(result int, id int) error {
+	err := u.loanRepo.UpdateLoanResult(result, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

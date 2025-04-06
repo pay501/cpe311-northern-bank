@@ -44,7 +44,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:5173/",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS, PATCH",
 		AllowHeaders:     "Content-Type, Authorization",
 		AllowCredentials: true,
 	}))
@@ -65,6 +65,7 @@ func main() {
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
 
 	app.Get("/loan-request-histories", loanCoontroller.GetLoanReqHistories)
+	app.Patch("/loan-request-histories/:id", loanCoontroller.UpdateLoanResult)
 
 	if err := app.Listen(":8080"); err != nil {
 		log.Fatal(err)

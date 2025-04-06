@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"fmt"
 	"northern-bank/internal/dto"
 )
 
@@ -47,7 +46,6 @@ func (r *LoanRepositoryDB) FindLoanHistories() ([]*dto.LoanHistoryRes, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("%v \n", loan)
 		loanHistories = append(loanHistories, loan)
 	}
 
@@ -56,4 +54,13 @@ func (r *LoanRepositoryDB) FindLoanHistories() ([]*dto.LoanHistoryRes, error) {
 	}
 
 	return loanHistories, nil
+}
+
+func (r *LoanRepositoryDB) UpdateLoanResult(result int, id int) error {
+	query := `UPDATE loan_histories SET result=$1 WHERE id=$2;`
+	_, err := r.db.Exec(query, result, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -11,6 +11,24 @@ export interface Account {
     user_id: number;
 }
 
+export interface LoanReqHistories {
+    applicant_income: number
+    coapplicant_income: number
+    credit_history: number
+    dependents: string
+    education: string
+    gender: string
+    id: number
+    loan_amount: number
+    loan_amount_term: number
+    married: string
+    property_area: string
+    result: null | number
+    self_employed: string
+    status: string
+    user_id: number
+}
+
 export type User = {
     Accounts: null;
     address: string;

@@ -2,6 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { User } from "../utils/types";
 import logo from "../assets/northern bank logo.png";
+import transferIcon from "../assets/transfer-horizontal-svgrepo-com.svg";
+import loanIcon from "../assets/loan-interest-time-value-of-money-effective-svgrepo-com.svg"
+import helpIcon from "../assets/help-circle-svgrepo-com.svg"
+import transactionIcon from "../assets/account-check-person-profile-user-group-svgrepo-com.svg"
+import settingIcon from "../assets/setting-svgrepo-com.svg"
+import homeIcon from "../assets/account-balance-cash-svgrepo-com.svg"
 
 type SidebarProps = {
   userData: User | null;
@@ -22,26 +28,32 @@ const sideBarLink = [
   {
     name: "หน้าหลัก",
     path: "/",
+    icon: homeIcon
   },
   {
     name: "สินเชื่อ",
     path: "/loan",
+    icon: loanIcon
   },
   {
     name: "โอนเงิน",
     path: "/fundtransfer",
+    icon: transferIcon,
   },
   {
     name: "ประวัติรายการ",
     path: "/transfer-history",
+    icon: transactionIcon,
   },
   {
     name: "ตั้งค่าบัญชี",
     path: "/settings",
+    icon: settingIcon,
   },
   {
     name: "ช่วยเหลือ",
     path: "/help",
+    icon: helpIcon,
   },
 ];
 
@@ -78,7 +90,17 @@ const Sidebar: React.FC<SidebarProps> = ({ userData }) => {
               }
               key={index}
             >
-              {val.name}
+              <img
+                src={val.icon}
+                alt={val.name}
+                width={28}
+                height={28}
+                className=" border-2 rounded-full"
+              />
+
+              <p className="ml-2">
+                {val.name}
+              </p>
             </Link>
           );
         })
@@ -90,8 +112,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userData }) => {
                 to={val.path}
                 className={
                   pathName === val.path
-                    ? `flex bg-green-700 pl-2 py-2 text-lg font-semibold`
-                    : `flex bg-green-600 pl-2 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-500 ease-in-out`
+                    ? `flex items-center gap-2 bg-green-700 px-4 py-2 text-lg font-semibold`
+                    : `flex items-center gap-2 bg-green-600 px-4 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-300`
                 }
                 key={index}
               >

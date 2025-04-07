@@ -56,6 +56,36 @@ func (r *LoanRepositoryDB) FindLoanHistories() ([]*dto.LoanHistoryRes, error) {
 	return loanHistories, nil
 }
 
+func (r *LoanRepositoryDB) FindLoanHistoriesByUserId(userId int) (*dto.LoanHistoryRes, error) {
+	query := `SELECT id, status, gender, married, dependents, education, self_employed, applicant_income, coapplicant_income, loan_amount, loan_amount_term, property_area, user_id, result, credit_history FROM loan_histories WHERE user_id = $1;`
+
+	row := r.db.QueryRow(query, userId)
+
+	loan := &dto.LoanHistoryRes{}
+	err := row.Scan(
+		&loan.ID,
+		&loan.Status,
+		&loan.Gender,
+		&loan.Married,
+		&loan.Dependents,
+		&loan.Education,
+		&loan.SelfEmployed,
+		&loan.ApplicantIncome,
+		&loan.CoapplicantIncome,
+		&loan.LoanAmount,
+		&loan.LoanAmountTerm,
+		&loan.PropertyArea,
+		&loan.UserID,
+		&loan.Result,
+		&loan.CreditHistory,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return loan, nil
+}
+
 func (r *LoanRepositoryDB) UpdateLoanResult(result int, id int) error {
 	query := `UPDATE loan_histories SET result=$1 WHERE id=$2;`
 	_, err := r.db.Exec(query, result, id)

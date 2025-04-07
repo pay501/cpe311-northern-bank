@@ -65,6 +65,7 @@ func main() {
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
 
 	app.Get("/loan-request-histories", loanCoontroller.GetLoanReqHistories)
+	app.Get("/loan-request-histories/:id", middleware.AuthMiddleware, loanCoontroller.GetLoanReqHistoryByUserId)
 	app.Patch("/loan-request-histories/:id", loanCoontroller.UpdateLoanResult)
 
 	if err := app.Listen(":8080"); err != nil {

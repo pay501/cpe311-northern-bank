@@ -1,8 +1,10 @@
 package usecases
 
 import (
+	"database/sql"
 	"northern-bank/internal/dto"
 	"northern-bank/internal/repositories"
+	"northern-bank/pkg"
 )
 
 type LoanUsecaseDb struct {
@@ -19,6 +21,17 @@ func (u *LoanUsecaseDb) GetLoanHistories() ([]*dto.LoanHistoryRes, error) {
 		return nil, err
 	}
 	return loanHisteries, nil
+}
+
+func (u *LoanUsecaseDb) GetLoanHistoryByUserId(userId int) (*dto.LoanHistoryRes, error) {
+	result, err := u.loanRepo.FindLoanHistoriesByUserId(userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, pkg.NewNotFoundError("loan not found")
+		}
+	}
+
+	return result, nil
 }
 
 func (u *LoanUsecaseDb) UpdateLoanResult(result int, id int) error {

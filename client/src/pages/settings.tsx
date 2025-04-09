@@ -1,36 +1,42 @@
 import React, { useState } from "react";
 import ChangeInformationModal from "../components/ChangeInformationModal";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useOutletContext } from "react-router-dom";
 import { User } from "../utils/types";
 
 interface SettingsProps {
   userData: User | null;
   jwtToken: string;
+  fetchUserData: (userId: number, jwtToken: string) => Promise<void>;
 }
 
 const Settings: React.FC = () => {
-  const { userData, jwtToken } = useOutletContext<SettingsProps>();
+  const { userData, jwtToken, fetchUserData } =
+    useOutletContext<SettingsProps>();
   const [activeTab, setActiveTab] = useState("personal");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newInformation, setNewInformation] = useState<string>("");
+  const [isDataBlank, setIsDataBlank] = useState(false);
   const [fiedlToChange, setfiedlToChange] = useState<string>("");
+  const [isDuplicate, setIsDuplicate] = useState(false);
+  const [isBadRequest, setIsBadRequest] = useState(false);
 
-  const maskPhone = (phone: string) => {
-    return `XXX-XXX-${phone.slice(-4)}`;
+  const maskPhone = (phone: string | null) => {
+    return `XXX-XXX-${phone?.slice(-4)}`;
   };
 
-  const maskEmail = (email: string) => {
+  const maskEmail = (email: string | null) => {
+    if (!email || !email.includes("@")) return "อีเมลไม่ถูกต้อง";
+
     const [local, domain] = email.split("@");
     return `${local.slice(0, 4).toUpperCase()}XXXXX@${domain.toUpperCase()}`;
   };
 
   const handleConfirm = async () => {
-    setIsModalOpen(false);
-    if (userData && jwtToken) {
+    if (userData && jwtToken && newInformation) {
       try {
         if (fiedlToChange === "email") {
-          const response = await axios.put(
+          await axios.put(
             `http://localhost:8080/user/${userData.user_id}?field=email`,
             {
               email: newInformation,
@@ -42,12 +48,13 @@ const Settings: React.FC = () => {
             }
           );
 
-          console.log(response.data);
+          await fetchUserData(userData.user_id, jwtToken);
+          setIsModalOpen(false);
         } else if (fiedlToChange === "phone") {
-          const response = await axios.put(
-            `http://localhost:8080/user/${userData.user_id}?field=email`,
+          await axios.put(
+            `http://localhost:8080/user/${userData.user_id}?field=phone`,
             {
-              email: newInformation,
+              phone_number: newInformation,
             },
             {
               headers: {
@@ -56,11 +63,21 @@ const Settings: React.FC = () => {
             }
           );
 
-          console.log(response.data);
+          await fetchUserData(userData.user_id, jwtToken);
+          setIsModalOpen(false);
         }
       } catch (error) {
-        console.log(error)
+        if (axios.isAxiosError(error)) {
+          const err = error as AxiosError;
+          if (err.response?.status === 409) {
+            setIsDuplicate(true);
+          } else if(err.response?.status === 400){
+            setIsBadRequest(true);
+          }
+        }
       }
+    } else {
+      setIsDataBlank(true);
     }
   };
 
@@ -112,7 +129,7 @@ const Settings: React.FC = () => {
             <div>
               <p className="text-gray-500 text-sm">เบอร์โทรศัพท์</p>
               <p className="text-gray-800 font-medium">
-                {maskPhone("0934521524")}
+                {maskPhone(userData?.phone_number ?? null)}
               </p>
               <button
                 className="text-green-600 font-semibold mt-1 hover:underline"
@@ -131,7 +148,7 @@ const Settings: React.FC = () => {
             <div>
               <p className="text-gray-500 text-sm">อีเมล</p>
               <p className="text-gray-800 font-medium">
-                {maskEmail("Kittichaispy2016@gmail.com")}
+                {maskEmail(userData?.email ?? null)}
               </p>
               <button
                 className="text-green-600 font-semibold mt-1 hover:underline"
@@ -159,6 +176,18 @@ const Settings: React.FC = () => {
           onConfirm={handleConfirm}
           newPhone={newInformation}
           setNewInformation={setNewInformation}
+          isDataBlank={isDataBlank}
+          setIsDataBlank={setIsDataBlank}
+          dataDuplicateInformation={{
+            isDuplicate,
+            text: "เบอร์โทรนี้มีคนใช้แล้ว",
+          }}
+          setIsDuplicate={setIsDuplicate}
+          dataBadRequestInfo={{
+            isBadRequest,
+            text:"รูบแบบเบอร์โทรศัพท์ไม่ถูกต้อง"
+          }}
+          setIsBadRequest={setIsBadRequest}
           datafiedlToChange={{
             fiedlToChange,
             topic: "เปลี่ยนเบอร์โทร",
@@ -173,6 +202,18 @@ const Settings: React.FC = () => {
           onConfirm={handleConfirm}
           newPhone={newInformation}
           setNewInformation={setNewInformation}
+          isDataBlank={isDataBlank}
+          setIsDataBlank={setIsDataBlank}
+          dataDuplicateInformation={{
+            isDuplicate,
+            text: "อีเมลล์นี้มีคนใช้แล้ว",
+          }}
+          setIsDuplicate={setIsDuplicate}
+          dataBadRequestInfo={{
+            isBadRequest,
+            text:"รูบแบบอีเมลล์ไม่ถูกต้อง"
+          }}
+          setIsBadRequest={setIsBadRequest}
           datafiedlToChange={{
             fiedlToChange,
             topic: "เปลี่ยนอีเมล",

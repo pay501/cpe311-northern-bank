@@ -175,3 +175,58 @@ func (u *UserUsecaseDb) SelectUserById(userId int, userIdFromToken int) (*entiti
 
 	return user, nil
 }
+
+func (u *UserUsecaseDb) UpdateUserInformaation(data *dto.UpdateUserInformation, userId int, field string) (*dto.UpdateUserCredentialRes, error) {
+	if field == "phone" {
+		isDuplicate, err := u.userRepo.CheckDuplicatePhoneNumber(*data.PhoneNumber)
+		if err != nil {
+			return nil, pkg.AppError{
+				Code:    500,
+				Message: err.Error(),
+			}
+		}
+		if isDuplicate {
+			return nil, pkg.AppError{
+				Code:    409,
+				Message: "this phone number has been use",
+			}
+		}
+		result, err := u.userRepo.UpdatePhoneNumber(data, userId)
+		if err != nil {
+			return nil, pkg.AppError{
+				Code:    500,
+				Message: err.Error(),
+			}
+		}
+		return result, nil
+	}
+	if field == "email" {
+		isDuplicate, err := u.userRepo.CheckDuplicateEmail(*data.Email)
+		if err != nil {
+			return nil, pkg.AppError{
+				Code:    500,
+				Message: err.Error(),
+			}
+		}
+		if isDuplicate {
+			return nil, pkg.AppError{
+				Code:    409,
+				Message: "this email has been use",
+			}
+		}
+
+		result, err := u.userRepo.UpdateEmail(data, userId)
+		if err != nil {
+			return nil, pkg.AppError{
+				Code:    500,
+				Message: err.Error(),
+			}
+		}
+		return result, nil
+	}
+
+	return nil, pkg.AppError{
+		Code:    400,
+		Message: "field incorrect",
+	}
+}

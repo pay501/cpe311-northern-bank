@@ -8,6 +8,7 @@ import (
 	"northern-bank/pkg"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -150,5 +151,46 @@ func (h *userHandler) GetUserById(c *fiber.Ctx) error {
 	}
 	return c.Status(200).JSON(fiber.Map{
 		"user": user,
+	})
+}
+
+func (h *userHandler) UpdateUserInfomation(c *fiber.Ctx) error {
+	field := c.Query("field")
+
+	userIdFromParam := c.Params("userId")
+	intUserIdFromParam, err := strconv.ParseInt(userIdFromParam, 10, 64)
+	if err != nil {
+		return handlerErr(c, err, 400)
+	}
+
+	userIdFromToken := c.Locals("user_id")
+	intUserIdFromToken, ok := userIdFromToken.(float64)
+	if !ok {
+		fmt.Println(intUserIdFromToken)
+		return handlerErr(c, fmt.Errorf("invalid user ID from token"), 400)
+	}
+
+	if intUserIdFromParam != int64(intUserIdFromToken) {
+		pkg.GetCallerInfo()
+		return handlerErr(c, fmt.Errorf("unauthorized access"), 401)
+	}
+
+	validate := validator.New()
+	var req dto.UpdateUserInformation
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	if err := validate.Struct(req); err != nil {
+		return handlerErr(c, err, 400)
+	}
+
+	result, err := h.userUsecase.UpdateUserInformaation(&req, int(intUserIdFromParam), field)
+	if err != nil {
+		return handlerErrs(c, err)
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"result": result,
 	})
 }

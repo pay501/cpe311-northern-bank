@@ -7,9 +7,9 @@ import (
 
 type UserRepository interface {
 	Save(user *entities.User) (int, error)
-	UpdateEmail(data *dto.UpdateUserCredentialReq) (*dto.UpdateUserCredentialRes, error)
-	UpdatePhoneNumber(data *dto.UpdateUserCredentialReq) (*dto.UpdateUserCredentialRes, error)
-	UpdatePassword(data *dto.UpdateUserCredentialReq) error
+	UpdateEmail(data *dto.UpdateUserInformation, userId int) (*dto.UpdateUserCredentialRes, error)
+	UpdatePhoneNumber(data *dto.UpdateUserInformation, userId int) (*dto.UpdateUserCredentialRes, error)
+	UpdatePassword(data *dto.UpdateUserInformation, userId int) error
 	FindByEmail(email string) (*entities.User, error)
 	FindUserByEmailOrUsername(data string) (map[string]interface{}, error)
 	FindTransactionByUserId(id int) ([]*entities.Transaction, error)

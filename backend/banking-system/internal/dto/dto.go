@@ -18,11 +18,6 @@ type TransferReq struct {
 	Amount           float64 `json:"amount"`
 }
 
-type UpdateUserCredentialReq struct {
-	Id         int    `json:"user_id"`
-	Credential string `json:"credential"`
-}
-
 type UpdateUserCredentialRes struct {
 	Id         int    `json:"user_id"`
 	Credential string `json:"credential"`
@@ -65,6 +60,6 @@ type LoanHistoryRes struct {
 	LoanAmountTerm    float64 `json:"loan_amount_term"`
 	PropertyArea      string  `json:"property_area"`
 	UserID            int     `json:"user_id"`
-	Result            *string `json:"result"`
+	Result            *int    `json:"result"`
 	CreditHistory     float64 `json:"credit_history"`
 }

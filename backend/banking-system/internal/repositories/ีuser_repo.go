@@ -95,42 +95,43 @@ func (r *UserRepositoryDB) FindByEmail(email string) (*entities.User, error) {
 	return nil, nil
 }
 
-func (r *UserRepositoryDB) UpdateEmail(data *dto.UpdateUserCredentialReq) (*dto.UpdateUserCredentialRes, error) {
+func (r *UserRepositoryDB) UpdateEmail(data *dto.UpdateUserInformation, userId int) (*dto.UpdateUserCredentialRes, error) {
 	query := `update users set email = $1 where id = $2;`
-	_, err := r.db.Exec(query, data.Credential, data.Id)
+	_, err := r.db.Exec(query, data.Email, userId)
 	if err != nil {
 		return nil, err
 	}
 
 	res := dto.UpdateUserCredentialRes{
-		Id:         data.Id,
-		Credential: data.Credential,
+		Id:         userId,
+		Credential: *data.Email,
 	}
 
 	return &res, nil
 }
 
-func (r *UserRepositoryDB) UpdatePhoneNumber(data *dto.UpdateUserCredentialReq) (*dto.UpdateUserCredentialRes, error) {
+func (r *UserRepositoryDB) UpdatePhoneNumber(data *dto.UpdateUserInformation, userId int) (*dto.UpdateUserCredentialRes, error) {
+
 	query := `update users set phone_number = $1 where id = $2;`
-	_, err := r.db.Exec(query, data.Credential, data.Id)
+	_, err := r.db.Exec(query, data.PhoneNumber, userId)
 	if err != nil {
 		return nil, err
 	}
 
 	res := dto.UpdateUserCredentialRes{
-		Id:         data.Id,
-		Credential: data.Credential,
+		Id:         userId,
+		Credential: *data.PhoneNumber,
 	}
 
 	return &res, nil
 }
 
-func (r *UserRepositoryDB) UpdatePassword(data *dto.UpdateUserCredentialReq) error {
-	query := `update users set password = $1 where id = $2;`
-	_, err := r.db.Exec(query, data.Credential, data.Id)
-	if err != nil {
-		return err
-	}
+func (r *UserRepositoryDB) UpdatePassword(data *dto.UpdateUserInformation, userId int) error {
+	/* 	query := `update users set password = $1 where id = $2;`
+	   	_, err := r.db.Exec(query, data.Credential, data.Id)
+	   	if err != nil {
+	   		return err
+	   	} */
 	return nil
 }
 

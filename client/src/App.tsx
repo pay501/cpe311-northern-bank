@@ -5,9 +5,10 @@ import Register from "./pages/Register";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Transfer from "./pages/Transfer";
-import Loan from "./pages/Loan";
+import Loan from "./pages/Loan"
 import Transaction from "./pages/Transaction";
 import WaitLoan from "./pages/WaitLoan";
+import Settings from "./pages/settings";
 
 const App: React.FC = () => {
 
@@ -33,6 +34,10 @@ const App: React.FC = () => {
         
         <Route path="/fundtransfer" element={<Layout/>}>
           <Route index element={<Transfer/>} />
+        </Route>
+
+        <Route path="/settings" element={<Layout/>}>
+          <Route index element={<Settings/>} />
         </Route>
 
         <Route path="/loan" element={<Layout/>}>

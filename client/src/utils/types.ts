@@ -58,3 +58,13 @@ export type TransactionType = {
     to_user_acc_no: string;
     to_user_bank_code: string;
 }
+
+export interface RecieverData {
+    AccID: string;
+    AccNo: string;
+    Balance: number;
+    BankCode: string;
+    FirstName: string;
+    LastName: string;
+    UserID: number;
+}

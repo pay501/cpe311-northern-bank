@@ -39,7 +39,6 @@ const App: React.FC = () => {
         <Route path="/settings" element={<Layout/>}>
           <Route index element={<Settings/>} />
         </Route>
-
         <Route path="/loan" element={<Layout/>}>
           <Route index element={<Loan/>}/>
         </Route>

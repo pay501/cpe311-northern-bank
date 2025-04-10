@@ -85,8 +85,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userData }) => {
               to={val.path}
               className={
                 pathName === val.path
-                  ? `flex bg-green-700 pl-2 py-2 text-lg font-semibold`
-                  : `flex bg-green-600 pl-2 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-500 ease-in-out`
+                  ? `flex bg-green-700 pl-2 py-2 text-lg font-semibold border-l-[6px] border-white`
+                  : `flex bg-green-600 pl-2 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-500 ease-in-out hover:border-l-[6px] hover:border-white`
               }
               key={index}
             >
@@ -112,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userData }) => {
                 to={val.path}
                 className={
                   pathName === val.path
-                    ? `flex items-center gap-2 bg-green-700 px-4 py-2 text-lg font-semibold`
+                    ? `flex items-center gap-2 bg-green-700 px-4 py-2 text-lg font-semibold border-l-4 border-white`
                     : `flex items-center gap-2 bg-green-600 px-4 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-300`
                 }
                 key={index}

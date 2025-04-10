@@ -12,4 +12,5 @@ type UserUsecase interface {
 	Transactions(id int) ([]*dto.TransactionRes, error)
 	SelectUserById(userId int, userIdFromToken int) (*entities.User, error)
 	UpdateUserInformaation(data *dto.UpdateUserInformation, userId int, field string) (*dto.UpdateUserCredentialRes, error)
+	CheckRecieverAccount(req *dto.CheckRecieverAccountReq) (*dto.AccountWithOwner, error)
 }

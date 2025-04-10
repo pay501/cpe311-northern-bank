@@ -75,6 +75,29 @@ func (h *userHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
+func (h *userHandler) CheckRecieverAccount(c *fiber.Ctx) error {
+	validate := validator.New()
+	req := dto.CheckRecieverAccountReq{}
+
+	err := c.BodyParser(&req)
+	if err != nil {
+		return handlerErr(c, err, 400)
+	}
+
+	if err = validate.Struct(req); err != nil {
+		return handlerErr(c, err, 400)
+	}
+
+	result, err := h.userUsecase.CheckRecieverAccount(&req)
+	if err != nil {
+		return handlerErrs(c, err)
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"result": result,
+	})
+}
+
 func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 	transfer_req := dto.TransferReq{}
 	err := c.BodyParser(&transfer_req)
@@ -95,7 +118,7 @@ func (h *userHandler) TransferMoney(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(200).JSON(fiber.Map{
 		"message":     "transfer successful",
 		"status code": fiber.StatusOK,
 		"transaction": transaction,

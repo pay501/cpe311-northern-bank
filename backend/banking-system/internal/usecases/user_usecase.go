@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"northern-bank/internal/dto"
@@ -119,6 +120,21 @@ func (u *UserUsecaseDb) Login(data dto.LoginReq) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (u *UserUsecaseDb) CheckRecieverAccount(req *dto.CheckRecieverAccountReq) (*dto.AccountWithOwner, error) {
+	result, err := u.userRepo.CheckRecieverAccount(req)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, pkg.AppError{
+				Code:    404,
+				Message: "reciever account not found",
+			}
+		}
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (u *UserUsecaseDb) Transfer(req_data dto.TransferReq) (*entities.Transaction, error) {

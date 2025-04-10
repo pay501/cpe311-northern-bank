@@ -16,6 +16,7 @@ type UserRepository interface {
 	TransferMoney(transferReq *entities.Transaction) (*entities.Transaction, error)
 	SelectUsers() ([]*entities.User, error)
 	FindUserById(userId int, userIdFromToken int) (*entities.User, error)
+	CheckRecieverAccount(req *dto.CheckRecieverAccountReq) (*dto.AccountWithOwner, error)
 	CheckDuplicateIDNumber(idNumber string) (bool, error)
 	CheckDuplicatePhoneNumber(phoneNumber string) (bool, error)
 	CheckDuplicateEmail(email string) (bool, error)

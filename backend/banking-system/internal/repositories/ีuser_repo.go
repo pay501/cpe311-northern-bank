@@ -135,6 +135,40 @@ func (r *UserRepositoryDB) UpdatePassword(data *dto.UpdateUserInformation, userI
 	return nil
 }
 
+func (r *UserRepositoryDB) CheckRecieverAccount(req *dto.CheckRecieverAccountReq) (*dto.AccountWithOwner, error) {
+	query := `
+		SELECT 
+			a.acc_id,
+			a.acc_no,
+			a.bank_code,
+			a.balance,
+			a.user_id,
+			u.first_name,
+			u.last_name
+		FROM accounts a
+		JOIN users u ON a.user_id = u.id
+		WHERE a.acc_no = $1 AND a.bank_code = $2
+	`
+
+	row := r.db.QueryRow(query, req.AccountNumber, req.BankCode)
+
+	var result dto.AccountWithOwner
+	err := row.Scan(
+		&result.AccID,
+		&result.AccNo,
+		&result.BankCode,
+		&result.Balance,
+		&result.UserID,
+		&result.FirstName,
+		&result.LastName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
 func (r *UserRepositoryDB) TransferMoney(transferReq *entities.Transaction) (*entities.Transaction, error) {
 	// Begin transaction
 	tx, err := r.db.Begin()

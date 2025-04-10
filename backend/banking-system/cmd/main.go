@@ -61,6 +61,7 @@ func main() {
 
 	app.Get("/user/:userId", middleware.AuthMiddleware, userController.GetUserById)
 	app.Get("/bank-information/:id", middleware.AuthMiddleware, accountController.GetAccountByUserId)
+	app.Post("/transfer-check", middleware.AuthMiddleware, userController.CheckRecieverAccount)
 	app.Post("/transfer", middleware.AuthMiddleware, userController.TransferMoney)
 	app.Get("/transactions", middleware.AuthMiddleware, userController.GetTransactions)
 	app.Get("/loan-request-histories", loanCoontroller.GetLoanReqHistories)

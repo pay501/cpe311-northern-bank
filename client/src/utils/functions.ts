@@ -32,3 +32,21 @@ export async function FetchUserData(userId: number, jwtToken: string) {
     console.log("Error fetching user data:", error);
   }
 }
+
+export const prepareBank = (bankCode: string | null) => {
+  if (bankCode === "SCB") {
+    return `ธนาคารไทยพานิชย์`;
+  } else if (bankCode === "NTHBANK") {
+    return `ธนาคารนอร์ธเทิร์น`;
+  } else if (bankCode === "KTB") {
+    return `ธนาคารกรุงไทย`;
+  }
+};
+
+export const modifyAccountNumber = (accountNumber: string | null) => {
+  // 467-3-35180-0
+  return `${accountNumber?.slice(0, 3)}-${accountNumber?.slice(
+    3,
+    4
+  )}-${accountNumber?.slice(4, 9)}-${accountNumber?.slice(-1)}`;
+};

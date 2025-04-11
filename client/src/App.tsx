@@ -9,6 +9,7 @@ import Loan from "./pages/Loan"
 import Transaction from "./pages/Transaction";
 import WaitLoan from "./pages/WaitLoan";
 import Settings from "./pages/settings";
+import Chat from "./pages/Chat";
 
 const App: React.FC = () => {
 
@@ -34,6 +35,10 @@ const App: React.FC = () => {
         
         <Route path="/fundtransfer" element={<Layout/>}>
           <Route index element={<Transfer/>} />
+        </Route>
+
+        <Route path="/chat-bot" element={<Layout/>}>
+          <Route index element={<Chat/>}/>
         </Route>
 
         <Route path="/settings" element={<Layout/>}>

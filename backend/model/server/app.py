@@ -1,3 +1,4 @@
+from typing import Union
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Depends, Header
@@ -68,7 +69,7 @@ class User(Base):
 class LoanRequest(BaseModel):
     Gender: str
     Married: str
-    Dependents: str
+    Dependents: Union[str, int]
     Education: str
     Self_Employed: str
     ApplicantIncome: float
@@ -127,7 +128,7 @@ def predict_loan(user_id: int, request: LoanRequest, db: Session = Depends(get_d
         raise HTTPException(status_code=403, detail="Unauthorized request")
 
     credit_history = get_credit_history(user_id, db)
-
+    
     processed_data = preprocess_input(request, credit_history)
 
     prediction = model.predict(processed_data)

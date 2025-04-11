@@ -36,7 +36,9 @@ const Loan: React.FC = () => {
     Loan_Amount_Term: 0,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loanReqHistory, setLoanReqHistory] = useState<LoanReqHistories | null>(null);
+  const [loanReqHistory, setLoanReqHistory] = useState<LoanReqHistories | null>(
+    null
+  );
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -69,7 +71,9 @@ const Loan: React.FC = () => {
             console.log("No loan request history found.");
           } else {
             console.error("Error fetching loan history:", axiosErr);
-            setFetchError(`เกิดข้อผิดพลาดในการโหลดประวัติการยื่นกู้: ${axiosErr.message}`);
+            setFetchError(
+              `เกิดข้อผิดพลาดในการโหลดประวัติการยื่นกู้: ${axiosErr.message}`
+            );
           }
         } else {
           console.error("An unexpected error occurred:", error);
@@ -116,6 +120,7 @@ const Loan: React.FC = () => {
     try {
       setIsLoading(true);
       setSubmitError(null);
+      console.log(formData);
       await axios.post(
         `http://localhost:8000/loan-request/${userData?.user_id}`,
         formData,
@@ -124,24 +129,17 @@ const Loan: React.FC = () => {
         }
       );
       fetchLoanReqHistory();
-      setFormData({
-        Gender: "",
-        Married: "",
-        Dependents: 0,
-        Education: "",
-        Self_Employed: "",
-        Property_Area: "",
-        ApplicantIncome: 0,
-        CoapplicantIncome: 0,
-        LoanAmount: 0,
-        Loan_Amount_Term: 0,
-      });
+
       setStep(1);
     } catch (error) {
       console.error("Error submitting loan request:", error);
       setIsLoading(false);
       if (axios.isAxiosError(error)) {
-        setSubmitError(`เกิดข้อผิดพลาดในการส่งคำขอกู้: ${error.response?.data?.message || error.message}`);
+        setSubmitError(
+          `เกิดข้อผิดพลาดในการส่งคำขอกู้: ${
+            error.response?.data?.message || error.message
+          }`
+        );
       } else {
         setSubmitError("เกิดข้อผิดพลาดที่ไม่คาดคิดในการส่งคำขอกู้");
       }
@@ -165,10 +163,10 @@ const Loan: React.FC = () => {
       )}
 
       {loanReqHistory?.result === 0 && !isLoading && (
-        <p>ขออภัยคำขอของท่านถูกปฏิเสธ</p>
+        <p>ขออภัยคำขอของท่านถูกปฏิเสธ <br />และจะสามารถทำรายการใหม่ได้อีกครั้ง ภายใน 30 วันที่ทำรายการ</p>
       )}
 
-      {!isLoading && loanReqHistory === null  && (
+      {!isLoading && loanReqHistory === null && (
         <>
           {step === 1 && (
             <div>
@@ -219,7 +217,9 @@ const Loan: React.FC = () => {
                 โสด
               </label>
 
-              <p className="text-lg font-semibold mt-3">จำนวนผู้ที่อยู่ในอุปการะ</p>
+              <p className="text-lg font-semibold mt-3">
+                จำนวนผู้ที่อยู่ในอุปการะ
+              </p>
               <input
                 type="number"
                 min={0}
@@ -235,18 +235,18 @@ const Loan: React.FC = () => {
                 <input
                   type="radio"
                   name="Education"
-                  value="Yes"
-                  checked={formData.Education === "Yes"}
+                  value="Graduate"
+                  checked={formData.Education === "Graduate"}
                   onChange={handleChange}
                 />{" "}
-                จบปริญญาตรี หริอสูงกว่า
+                จบปริญญาตรีหรือสูงกว่า
               </label>
               <label className="ml-8">
                 <input
                   type="radio"
                   name="Education"
-                  value="No"
-                  checked={formData.Education === "No"}
+                  value="Not Graduate"
+                  checked={formData.Education === "Not Graduate"}
                   onChange={handleChange}
                 />{" "}
                 จบต่ำกว่าปริญญาตรี
@@ -274,7 +274,9 @@ const Loan: React.FC = () => {
                 ไม่
               </label>
 
-              <p className="text-lg font-semibold mt-3">พื้นที่อสังหาริมทรัพย์</p>
+              <p className="text-lg font-semibold mt-3">
+                พื้นที่อสังหาริมทรัพย์
+              </p>
               <label>
                 <input
                   type="radio"
@@ -351,7 +353,9 @@ const Loan: React.FC = () => {
                 className="w-full mb-2 p-2 border rounded"
               />
 
-              <p className="text-lg font-semibold mt-3">ระยะเวลาการกู้ (เดือน)</p>
+              <p className="text-lg font-semibold mt-3">
+                ระยะเวลาการกู้ (เดือน)
+              </p>
               <input
                 type="number"
                 name="Loan_Amount_Term"

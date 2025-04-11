@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userData }) => {
               className={
                 pathName === val.path
                   ? `flex bg-green-700 pl-2 py-2 text-lg font-semibold border-l-[6px] border-white`
-                  : `flex bg-green-600 pl-2 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-500 ease-in-out hover:border-l-[6px] hover:border-white`
+                  : `flex bg-green-600 pl-2 py-2 text-lg font-semibold hover:bg-green-700 transition-colors duration-500 border-l-[6px] border-green-600  ease-in-out hover:border-l-[6px] hover:border-white`
               }
               key={index}
             >

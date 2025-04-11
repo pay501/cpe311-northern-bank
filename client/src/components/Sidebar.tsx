@@ -8,6 +8,7 @@ import helpIcon from "../assets/help-circle-svgrepo-com.svg"
 import transactionIcon from "../assets/account-check-person-profile-user-group-svgrepo-com.svg"
 import settingIcon from "../assets/setting-svgrepo-com.svg"
 import homeIcon from "../assets/account-balance-cash-svgrepo-com.svg"
+import chatbotIcon from "../assets/chatbot-svgrepo-com.svg"
 
 type SidebarProps = {
   userData: User | null;
@@ -44,6 +45,11 @@ const sideBarLink = [
     name: "ประวัติรายการ",
     path: "/transfer-history",
     icon: transactionIcon,
+  },
+  {
+    name: "แชทกับบอท",
+    path:"/chat-bot",
+    icon: chatbotIcon
   },
   {
     name: "ตั้งค่าบัญชี",

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import {DecodedToken, User } from "../utils/types";
+import { DecodedToken, User } from "../utils/types";
 import { useNavigate } from "react-router-dom";
 import { DecodedJwtToken, FetchUserData } from "../utils/functions";
-
+import axios, { AxiosError } from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,23 +29,21 @@ const Register = () => {
     }
 
     const decodedToken: DecodedToken = DecodedJwtToken(jwtToken);
-    console.log(decodedToken);
 
     const response = await FetchUserData(decodedToken.user_id, jwtToken);
     if (response?.data?.user) {
-      console.log("Fetched User:", response.data.user);
-      setUserData(response.data.user)
+      setUserData(response.data.user);
     }
   };
 
   useEffect(() => {
-    fetchData()
-    if(userData != null){
-      if(userData.role !== "admin"){
-        navigate("/authen")
+    fetchData();
+    if (userData != null) {
+      if (userData.role !== "admin") {
+        navigate("/authen");
       }
     }
-  }, [userData]);
+  }, []);
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -56,9 +54,35 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting Data:", formData);
-    alert("สมัครสมาชิกสำเร็จ!");
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/register?balance=${500}`,
+        formData
+      );
+      setFormData({
+        id_number: "",
+        first_name: "",
+        last_name: "",
+        gender: "",
+        birth_day: "",
+        address: "",
+        phone_number: "",
+        email: "",
+        username: "",
+        password: "",
+      });
+      setStep(1);
+      alert("User has been created.");
+      console.log(response);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const err = error as AxiosError;
+        const errDuplicate = err.response?.data as any;
+        alert(errDuplicate?.message);
+        console.log(err.response);
+      }
+    }
   };
 
   return (

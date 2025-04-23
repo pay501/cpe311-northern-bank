@@ -45,19 +45,6 @@ This project contains the **CPE311 North Bank** system, a full-stack banking app
     npm run dev
     ```
 
-## Testing
-### Backend
-1. Run backend tests:
-    ```sh
-    go test ./...
-    ```
-
-### Frontend
-1. Run frontend tests:
-    ```sh
-    npm test
-    ```
-
 ## Contributing
 Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests.
 
